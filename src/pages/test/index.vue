@@ -61,9 +61,7 @@
 import { defineComponent, ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useStore } from '@/store'
-import type { TestPaperItem, TestItem, AnswerItem, ResultItem } from '@/types/test'
-
-const QUESTIONS_BASE_URL = 'https://purre-green-1309961435.cos.ap-chengdu.myqcloud.com/Scale/questions'
+import type { TestPaperItem } from '@/types/test'
 
 export default defineComponent({
     name: 'TestPage',
@@ -93,67 +91,9 @@ export default defineComponent({
             if (paper.items) {
                 paper.items.forEach((item) => {
                     item.answers.forEach((answer) => {
-                        answer.selected = null
+                        answer.selected = undefined
                     })
                 })
-            }
-        }
-
-        // 从本地缓存加载题目
-        const loadQuestionsFromCache = (id: string): TestItem[] | null => {
-            try {
-                const key = `questions_${id}`
-                const cached = uni.getStorageSync(key)
-                return cached ? JSON.parse(cached) : null
-            } catch (e) {
-                console.error('Failed to load questions from cache:', e)
-                return null
-            }
-        }
-
-        // 保存题目到本地缓存
-        const saveQuestionsToCache = (id: string, questions: TestItem[]) => {
-            try {
-                const key = `questions_${id}`
-                uni.setStorageSync(key, JSON.stringify(questions))
-            } catch (e) {
-                console.error('Failed to save questions to cache:', e)
-            }
-        }
-
-        // 加载题目数据
-        const loadQuestions = async (id: string) => {
-            // 先尝试从缓存加载
-            const cachedQuestions = loadQuestionsFromCache(id)
-            if (cachedQuestions) {
-                if (testPaper.value) {
-                    testPaper.value.items = cachedQuestions
-                }
-            }
-
-            try {
-                // 同时发起网络请求更新数据
-                const response = await uni.request({
-                    url: `${QUESTIONS_BASE_URL}/${id}.json`,
-                    method: 'GET'
-                })
-
-                if (response.statusCode === 200 && response.data) {
-                    // 更新缓存和当前数据
-                    saveQuestionsToCache(id, response.data)
-                    if (testPaper.value) {
-                        testPaper.value.items = response.data
-                    }
-                }
-            } catch (e) {
-                console.error('Failed to fetch questions:', e)
-                // 如果网络请求失败但有缓存数据，继续使用缓存数据
-                if (!cachedQuestions) {
-                    uni.showToast({
-                        title: '加载题目失败',
-                        icon: 'none'
-                    })
-                }
             }
         }
 
@@ -162,17 +102,14 @@ export default defineComponent({
             const test = store.state.test.testItems.find((item) => item.id === testId)
             if (test) {
                 testPaper.value = JSON.parse(JSON.stringify(test))
-                // 重置答案状态
                 resetAnswers(testPaper.value)
-                // 加载题目数据
-                loadQuestions(testId)
             }
-            
+
             answers.value = new Array(testPaper.value?.items?.length || 0).fill(-1)
-            
+
             if (testPaper.value) {
                 uni.setNavigationBarTitle({
-                    title: testPaper.value.name
+                    title: testPaper.value.name,
                 })
             }
         })
@@ -206,61 +143,91 @@ export default defineComponent({
                 if (testPaper.value?.items && testPaper.value.soloChoice) {
                     const nextAnswerIndex = answers.value[currentIndex.value]
                     if (nextAnswerIndex !== -1) {
-                        testPaper.value.items[currentIndex.value].answers.forEach((answer, index) => {
-                            answer.selected = index === nextAnswerIndex
-                        })
+                        testPaper.value.items[currentIndex.value].answers.forEach(
+                            (answer, index) => {
+                                answer.selected = index === nextAnswerIndex
+                            }
+                        )
                     }
                 }
             }
         }
 
         // 完成测评，计算得分
-        const finishTest = () => {
+        const finishTest = async () => {
             if (!testPaper.value) return
 
-            // 计算总分
+            // 计算原始分数和收集答案
             let totalScore = 0
+            const selectedAnswers: number[][] = []
+
             testPaper.value.items?.forEach((item, index) => {
+                const questionAnswers: number[] = []
                 if (testPaper.value?.soloChoice) {
-                    // 单选模式：使用答案数组中的选择
+                    questionAnswers.push(answers.value[index])
                     totalScore += item.answers[answers.value[index]].score
                 } else {
-                    // 多选模式：计算所有选中答案的分数
-                    item.answers.forEach(answer => {
+                    item.answers.forEach((answer, answerIndex) => {
                         if (answer.selected) {
+                            questionAnswers.push(answerIndex)
                             totalScore += answer.score
                         }
                     })
                 }
+                selectedAnswers.push(questionAnswers)
             })
 
-            // 创建结果对象
-            const result: ResultItem = {
-                id: Date.now().toString(),
-                test: {
-                    id: testPaper.value.id,
-                    name: testPaper.value.name,
-                    description: testPaper.value.description,
-                    userCount: testPaper.value.userCount,
-                    questionCount: testPaper.value.questionCount,
-                    duration: testPaper.value.duration,
-                    type: testPaper.value.type,
-                    source: testPaper.value.source,
-                    soloChoice: testPaper.value.soloChoice
-                },
-                completedDate: Date.now(),
-                score: totalScore,
-                scoreText: getScoreText(totalScore),
-                suggest: testPaper.value.suggest
+            try {
+                let finalScore = totalScore
+                let scoreText = getScoreText(totalScore)
+                let suggest = testPaper.value.suggest
+
+                // 使用缓存的评分脚本
+                const scriptContent = loadScriptFromCache(testPaper.value.id)
+                if (scriptContent) {
+                    const scoreCalculator = new Function('score', 'answers', scriptContent)
+                    const result = scoreCalculator(totalScore, selectedAnswers)
+                    if (result) {
+                        finalScore = result.score ?? totalScore
+                        scoreText = result.scoreText ?? getScoreText(finalScore)
+                        suggest = result.suggest ?? suggest
+                    }
+                }
+
+                // 创建结果对象
+                const resultItem: ResultItem = {
+                    id: Date.now().toString(),
+                    test: {
+                        id: testPaper.value.id,
+                        name: testPaper.value.name,
+                        description: testPaper.value.description,
+                        userCount: testPaper.value.userCount,
+                        questionCount: testPaper.value.questionCount,
+                        duration: testPaper.value.duration,
+                        type: testPaper.value.type,
+                        source: testPaper.value.source,
+                        soloChoice: testPaper.value.soloChoice,
+                    },
+                    completedDate: Date.now(),
+                    score: finalScore,
+                    scoreText,
+                    suggest,
+                }
+
+                // 保存到 store
+                store.dispatch('test/addTestResult', resultItem)
+
+                // 跳转到结果页面
+                uni.navigateTo({
+                    url: `/pages/test-result/index?id=${resultItem.id}`,
+                })
+            } catch (e) {
+                console.error('Error in score calculation:', e)
+                uni.showToast({
+                    title: '计算分数时出错',
+                    icon: 'none',
+                })
             }
-
-            // 保存到 store
-            store.dispatch('test/addTestResult', result)
-
-            // 跳转到结果页面
-            uni.navigateTo({
-                url: `/pages/test-result/index?id=${result.id}`
-            })
         }
 
         // 根据分数获取结果描述
@@ -279,9 +246,11 @@ export default defineComponent({
                 if (testPaper.value?.items && testPaper.value.soloChoice) {
                     const prevAnswerIndex = answers.value[currentIndex.value]
                     if (prevAnswerIndex !== -1) {
-                        testPaper.value.items[currentIndex.value].answers.forEach((answer, index) => {
-                            answer.selected = index === prevAnswerIndex
-                        })
+                        testPaper.value.items[currentIndex.value].answers.forEach(
+                            (answer, index) => {
+                                answer.selected = index === prevAnswerIndex
+                            }
+                        )
                     }
                 }
             }
@@ -391,8 +360,8 @@ export default defineComponent({
 
             // 选中状态
             &.selected {
-                background: rgba(64, 128, 255, 0.1);  // 修改为半透明蓝色
-                color: #4080ff;  // 文字改为蓝色
+                background: rgba(64, 128, 255, 0.1); // 修改为半透明蓝色
+                color: #4080ff; // 文字改为蓝色
                 position: relative;
 
                 // 添加选中时的左边框标识
@@ -403,7 +372,7 @@ export default defineComponent({
                     top: 0;
                     bottom: 0;
                     width: 6rpx;
-                    background: #4080ff;  // 边框标识改为蓝色
+                    background: #4080ff; // 边框标识改为蓝色
                     border-radius: 3rpx;
                 }
             }

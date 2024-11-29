@@ -61,7 +61,9 @@
                 <image src="/static/images/share.png" mode="aspectFit" class="share-icon" />
                 分享
             </button>
-            <button class="start-btn" @tap="startTest">开始测评</button>
+            <button class="start-btn" @tap="startTest" :disabled="isLoading">
+                {{ isLoading ? '资源加载中...' : '开始测评' }}
+            </button>
         </view>
     </view>
 </template>
@@ -69,20 +71,124 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import type { TestPaperItem } from '@/types/test'
+import type { TestPaperItem, TestItem } from '@/types/test'
 import { useStore } from '@/store'
+
+const QUESTIONS_BASE_URL =
+    'https://purre-green-1309961435.cos.ap-chengdu.myqcloud.com/Scale/questions'
+const SCRIPT_BASE_URL = 'https://purre-green-1309961435.cos.ap-chengdu.myqcloud.com/Scale/scriptes'
 
 export default defineComponent({
     name: 'TestIntro',
     setup() {
         const store = useStore()
         const testInfo = ref<TestPaperItem>()
+        const isLoading = ref(false)
+
+        // 从本地缓存加载题目
+        const loadQuestionsFromCache = (id: string): TestItem[] | null => {
+            try {
+                const key = `questions_${id}`
+                const cached = uni.getStorageSync(key)
+                return cached ? JSON.parse(cached) : null
+            } catch (e) {
+                console.error('Failed to load questions from cache:', e)
+                return null
+            }
+        }
+
+        // 保存题目到本地缓存
+        const saveQuestionsToCache = (id: string, questions: TestItem[]) => {
+            try {
+                const key = `questions_${id}`
+                uni.setStorageSync(key, JSON.stringify(questions))
+            } catch (e) {
+                console.error('Failed to save questions to cache:', e)
+            }
+        }
+
+        // 加载远端题目数据
+        const loadRemoteQuestions = async (id: string): Promise<TestItem[] | null> => {
+            const response = await uni.request({
+                url: `${QUESTIONS_BASE_URL}/${id}.json`,
+                method: 'GET',
+            })
+
+            if (response.statusCode === 200 && response.data) {
+                saveQuestionsToCache(id, response.data as TestItem[])
+                return response.data as TestItem[]
+            }
+            return null
+        }
+
+        // 加载脚本相关函数
+        const loadScriptFromCache = (id: string): string | null => {
+            try {
+                const key = `script_${id}`
+                return uni.getStorageSync(key)
+            } catch (e) {
+                console.error('Failed to load script from cache:', e)
+                return null
+            }
+        }
+
+        const saveScriptToCache = (id: string, script: string) => {
+            try {
+                const key = `script_${id}`
+                uni.setStorageSync(key, script)
+            } catch (e) {
+                console.error('Failed to save script to cache:', e)
+            }
+        }
+
+        // 加载远程脚本
+        const loadRemoteScript = async (id: string): Promise<string | null> => {
+            const response = await uni.request({
+                url: `${SCRIPT_BASE_URL}/${id}.js`,
+                method: 'GET',
+            })
+
+            if (response.statusCode === 200 && response.data) {
+                const scriptContent = response.data as string
+                saveScriptToCache(id, scriptContent)
+                return scriptContent
+            }
+            return null
+        }
 
         onLoad((options: any) => {
-            testInfo.value = store.state.test.testItems.find((item) => item.id === options.id)
+            const testId = options.id
+            testInfo.value = store.state.test.testItems.find((item) => item.id === testId)
+
+            // 预加载资源
+            loadResources(testId)
         })
 
+        // 加载所需资源
+        const loadResources = async (id: string) => {
+            isLoading.value = true
+            try {
+                // 并行加载题目和脚本
+                await Promise.all([
+                    // 加载题目
+                    loadQuestionsFromCache(id) || loadRemoteQuestions(id),
+                    // 加载脚本
+                    loadScriptFromCache(id) || loadRemoteScript(id),
+                ])
+            } catch (e) {
+                console.error('Failed to load resources:', e)
+                uni.showToast({
+                    title: '资源加载失败',
+                    icon: 'none',
+                })
+            } finally {
+                isLoading.value = false
+            }
+        }
+
         const startTest = () => {
+            if (isLoading.value) return
+
             if (testInfo.value) {
                 uni.navigateTo({
                     url: `/pages/test/index?type=${testInfo.value.id}`,
@@ -98,6 +204,7 @@ export default defineComponent({
 
         return {
             testInfo,
+            isLoading,
             startTest,
             handleShare,
         }
