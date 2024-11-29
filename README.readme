@@ -1,0 +1,13 @@
+# UniApp TypeScript项目
+这是一个基于uni-app + TypeScript开发的微信小程序项目，已经完成初步开发，可以正常运行。
+
+
+## 技术栈
+- 主要语言: TypeScript 
+- 前端框架：uni-app
+- 开发工具：HBuilderX
+- 小程序框架：微信小程序
+
+
+
+
