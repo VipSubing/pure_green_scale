@@ -76,7 +76,6 @@ import { useStore } from '@/store'
 
 const QUESTIONS_BASE_URL =
     'https://purre-green-1309961435.cos.ap-chengdu.myqcloud.com/Scale/questions'
-const SCRIPT_BASE_URL = 'https://purre-green-1309961435.cos.ap-chengdu.myqcloud.com/Scale/scriptes'
 
 export default defineComponent({
     name: 'TestIntro',
@@ -112,6 +111,9 @@ export default defineComponent({
             const response = await uni.request({
                 url: `${QUESTIONS_BASE_URL}/${id}.json`,
                 method: 'GET',
+                header: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                },
             })
 
             if (response.statusCode === 200 && response.data) {
@@ -121,45 +123,9 @@ export default defineComponent({
             return null
         }
 
-        // 加载脚本相关函数
-        const loadScriptFromCache = (id: string): string | null => {
-            try {
-                const key = `script_${id}`
-                return uni.getStorageSync(key)
-            } catch (e) {
-                console.error('Failed to load script from cache:', e)
-                return null
-            }
-        }
-
-        const saveScriptToCache = (id: string, script: string) => {
-            try {
-                const key = `script_${id}`
-                uni.setStorageSync(key, script)
-            } catch (e) {
-                console.error('Failed to save script to cache:', e)
-            }
-        }
-
-        // 加载远程脚本
-        const loadRemoteScript = async (id: string): Promise<string | null> => {
-            const response = await uni.request({
-                url: `${SCRIPT_BASE_URL}/${id}.js`,
-                method: 'GET',
-            })
-
-            if (response.statusCode === 200 && response.data) {
-                const scriptContent = response.data as string
-                saveScriptToCache(id, scriptContent)
-                return scriptContent
-            }
-            return null
-        }
-
         onLoad((options: any) => {
             const testId = options.id
             testInfo.value = store.state.test.testItems.find((item) => item.id === testId)
-
             // 预加载资源
             loadResources(testId)
         })
@@ -168,18 +134,20 @@ export default defineComponent({
         const loadResources = async (id: string) => {
             isLoading.value = true
             try {
-                // 并行加载题目和脚本
-                await Promise.all([
-                    // 加载题目
-                    loadQuestionsFromCache(id) || loadRemoteQuestions(id),
-                    // 加载脚本
-                    loadScriptFromCache(id) || loadRemoteScript(id),
-                ])
+                // 只加载题目数据
+                const cachedQuestions = loadQuestionsFromCache(id)
+                if (cachedQuestions) {
+                    // 如果有缓存,异步更新
+                    loadRemoteQuestions(id)
+                } else {
+                    // 如果没有缓存,同步加载
+                    await loadRemoteQuestions(id)
+                }
             } catch (e) {
                 console.error('Failed to load resources:', e)
                 uni.showToast({
                     title: '资源加载失败',
-                    icon: 'none',
+                    icon: 'none'
                 })
             } finally {
                 isLoading.value = false

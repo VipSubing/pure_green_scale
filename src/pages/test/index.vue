@@ -7,11 +7,11 @@
                 <view
                     class="progress-fill"
                     :style="{
-                        width: `${((currentIndex + 1) / testPaper?.items?.length) * 100}%`,
+                        width: `${((currentIndex + 1) / (testPaper?.items?.length ?? 1)) * 100}%`,
                     }"></view>
             </view>
             <text class="progress-count"
-                >{{ currentIndex + 1 }}/{{ testPaper?.items?.length }}</text
+                >{{ currentIndex + 1 }}/{{ testPaper?.items?.length ?? 0 }}</text
             >
         </view>
 
@@ -61,7 +61,8 @@
 import { defineComponent, ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useStore } from '@/store'
-import type { TestPaperItem } from '@/types/test'
+import type { ResultItem, TestPaperItem } from '@/types/test'
+import test from '@/store/modules/test'
 
 export default defineComponent({
     name: 'TestPage',
@@ -101,8 +102,17 @@ export default defineComponent({
             const testId = options.type
             const test = store.state.test.testItems.find((item) => item.id === testId)
             if (test) {
-                testPaper.value = JSON.parse(JSON.stringify(test))
-                resetAnswers(testPaper.value)
+                // 从缓存获取题目数据
+                const key = `questions_${testId}`
+                const cachedQuestions = uni.getStorageSync(key)
+                if (cachedQuestions) {
+                    const questions = JSON.parse(cachedQuestions)
+                    testPaper.value = {
+                        ...test,
+                        items: questions,
+                    }
+                    resetAnswers(testPaper.value)
+                }
             }
 
             answers.value = new Array(testPaper.value?.items?.length || 0).fill(-1)
@@ -157,85 +167,29 @@ export default defineComponent({
         const finishTest = async () => {
             if (!testPaper.value) return
 
-            // 计算原始分数和收集答案
-            let totalScore = 0
-            const selectedAnswers: number[][] = []
+            try {
+                let finalScore = 0
 
-            testPaper.value.items?.forEach((item, index) => {
-                const questionAnswers: number[] = []
-                if (testPaper.value?.soloChoice) {
-                    questionAnswers.push(answers.value[index])
-                    totalScore += item.answers[answers.value[index]].score
-                } else {
-                    item.answers.forEach((answer, answerIndex) => {
+                // 计算总分
+                testPaper.value.items?.forEach((item) => {
+                    item.answers.forEach((answer) => {
                         if (answer.selected) {
-                            questionAnswers.push(answerIndex)
-                            totalScore += answer.score
+                            finalScore += answer.score
                         }
                     })
-                }
-                selectedAnswers.push(questionAnswers)
-            })
+                })
 
-            try {
-                let finalScore = totalScore
-                let scoreText = getScoreText(totalScore)
-                let suggest = testPaper.value.suggest
-
-                // 使用缓存的评分脚本
-                const scriptContent = loadScriptFromCache(testPaper.value.id)
-                if (scriptContent) {
-                    const scoreCalculator = new Function('score', 'answers', scriptContent)
-                    const result = scoreCalculator(totalScore, selectedAnswers)
-                    if (result) {
-                        finalScore = result.score ?? totalScore
-                        scoreText = result.scoreText ?? getScoreText(finalScore)
-                        suggest = result.suggest ?? suggest
-                    }
-                }
-
-                // 创建结果对象
-                const resultItem: ResultItem = {
-                    id: Date.now().toString(),
-                    test: {
-                        id: testPaper.value.id,
-                        name: testPaper.value.name,
-                        description: testPaper.value.description,
-                        userCount: testPaper.value.userCount,
-                        questionCount: testPaper.value.questionCount,
-                        duration: testPaper.value.duration,
-                        type: testPaper.value.type,
-                        source: testPaper.value.source,
-                        soloChoice: testPaper.value.soloChoice,
-                    },
-                    completedDate: Date.now(),
-                    score: finalScore,
-                    scoreText,
-                    suggest,
-                }
-
-                // 保存到 store
-                store.dispatch('test/addTestResult', resultItem)
-
-                // 跳转到结果页面
+                // 直接跳转到结果页面，传递必要参数
                 uni.navigateTo({
-                    url: `/pages/test-result/index?id=${resultItem.id}`,
+                    url: `/pages/test-result/index?type=test&id=${testPaper.value.id}`,
                 })
             } catch (e) {
-                console.error('Error in score calculation:', e)
+                console.error('计算分数时出错:', e)
                 uni.showToast({
                     title: '计算分数时出错',
                     icon: 'none',
                 })
             }
-        }
-
-        // 根据分数获取结果描述
-        const getScoreText = (score: number): string => {
-            if (score >= 27) return '重度抑郁倾向'
-            if (score >= 20) return '中度抑郁倾向'
-            if (score >= 10) return '轻度抑郁倾向'
-            return '心理状态正常'
         }
 
         // 上一题按钮

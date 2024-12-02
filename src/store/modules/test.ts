@@ -3,8 +3,10 @@ import type { TestPaperItem, ResultItem } from '@/types/test'
 const HISTORY_STORAGE_KEY = 'test_history_results'
 const RECOMMENDED_TESTS_STORAGE_KEY = 'recommended_tests'
 const ALL_TESTS_STORAGE_KEY = 'all_tests'
-const RECOMMENDED_TESTS_URL = 'https://purre-green-1309961435.cos.ap-chengdu.myqcloud.com/Scale/recommands-test.json'
-const ALL_TESTS_URL = 'https://purre-green-1309961435.cos.ap-chengdu.myqcloud.com/Scale/all-tests.json'
+const RECOMMENDED_TESTS_URL =
+    'https://purre-green-1309961435.cos.ap-chengdu.myqcloud.com/Scale/recommands-test.json'
+const ALL_TESTS_URL =
+    'https://purre-green-1309961435.cos.ap-chengdu.myqcloud.com/Scale/all-tests.json'
 
 // 从本地缓存加载历史记录
 const loadHistoryFromStorage = (): ResultItem[] => {
@@ -81,20 +83,23 @@ export default {
         testItems: loadAllTestsFromStorage(), // 初始化时从缓存加载
         categoryTabs: ['全部', '焦虑', '抑郁', '人格'],
         currentCategory: 0,
-        historyResults: loadHistoryFromStorage()
+        historyResults: loadHistoryFromStorage(),
     }),
 
     getters: {
-        proTest: (state: TestState) => state.recommendedTests[0],   
+        proTest: (state: TestState) => state.recommendedTests[0],
         // recommendedTests 除了 第一个 以外的测试
         gridTestItems: (state: TestState) => state.recommendedTests.slice(1),
         // allTests: (state: TestState) => state.testItems,
         // 根据currentCategory过滤测试, 全部 则返回所有测试,1 则返回type=anxiety,2 则返回type=depressed,3 则返回type=personality,使用if else表示
         filteredTests: (state: TestState) => {
             if (state.currentCategory === 0) return state.testItems
-            if (state.currentCategory === 1) return state.testItems.filter((item) => item.type === 'anxiety')
-            if (state.currentCategory === 2) return state.testItems.filter((item) => item.type === 'depressed')
-            if (state.currentCategory === 3) return state.testItems.filter((item) => item.type === 'personality')
+            if (state.currentCategory === 1)
+                return state.testItems.filter((item) => item.type === 'anxiety')
+            if (state.currentCategory === 2)
+                return state.testItems.filter((item) => item.type === 'depressed')
+            if (state.currentCategory === 3)
+                return state.testItems.filter((item) => item.type === 'personality')
             return []
         },
         historyList: (state: TestState) => state.historyResults,
@@ -127,7 +132,7 @@ export default {
         SET_ALL_TESTS(state: TestState, tests: TestPaperItem[]) {
             state.testItems = tests
             saveAllTestsToStorage(tests)
-        }
+        },
     },
 
     actions: {
@@ -148,12 +153,15 @@ export default {
             commit('SET_HISTORY_RESULTS', history)
         },
         // 加载推荐测试
-        async loadRecommendedTests({ commit }) {
+        async loadRecommendedTests({ commit }: { commit: any }) {
             try {
                 // 尝试从网络获取
                 const response = await uni.request({
                     url: RECOMMENDED_TESTS_URL,
-                    method: 'GET'
+                    method: 'GET',
+                    header: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    },
                 })
 
                 if (response.statusCode === 200 && response.data) {
@@ -177,7 +185,10 @@ export default {
                 // 尝试从网络获取
                 const response = await uni.request({
                     url: ALL_TESTS_URL,
-                    method: 'GET'
+                    method: 'GET',
+                    header: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    },
                 })
 
                 if (response.statusCode === 200 && response.data) {
@@ -194,6 +205,6 @@ export default {
             if (cachedTests.length > 0) {
                 commit('SET_ALL_TESTS', cachedTests)
             }
-        }
+        },
     },
 }

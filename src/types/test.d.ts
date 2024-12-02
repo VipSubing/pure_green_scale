@@ -30,7 +30,7 @@ export interface ResultItem {
     completedDate: number
     score: number
     scoreText: string
-    introTexts?: string[]
+    introTexts: string
     suggest?: ResultSuggest
 }
 

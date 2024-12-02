@@ -1,57 +1,65 @@
 <template>
     <view class="result-page">
-        <!-- 头部标题 -->
-        <view class="header">
-            <text class="title">{{ manifest.name }} · 测评结果</text>
+        <!-- 加载状态 -->
+        <view v-if="isLoading" class="loading-state">
+            <text>计算结果中...</text>
         </view>
 
-        <!-- 结果区域 -->
-        <view class="result-section">
-            <text class="result-title">{{ resultInfo?.scoreText }}</text>
-            <view class="score-circle">
-                <text class="score">{{ resultInfo?.score }}</text>
-                <text class="unit">分</text>
-            </view>
-        </view>
-
-        <!-- 结果概述 -->
-        <view class="result-content">
-            <view class="section-title">测评结果概述</view>
-            <view class="result-desc">
-                您的结果区间在 ({{ resultInfo?.score - 7 }}, {{ resultInfo?.score + 7 }})，
-                {{ resultInfo?.scoreText }}，一定要看心理医生或精神科医生。
+        <!-- 结果内容 -->
+        <template v-else>
+            <!-- 头部标题 -->
+            <view class="header">
+                <text class="title">{{ manifest.name }} · 测评结果</text>
             </view>
 
-            <!-- 添加分割线 -->
-            <view class="divider"></view>
-
-            <!-- 免责声明 -->
-            <view class="disclaimer"> 此测试结果仅供参考，不能代替医生诊断 </view>
-        </view>
-
-        <!-- 健康小贴士 -->
-        <view v-if="resultInfo?.suggest" class="tips-section">
-            <view class="section-title">
-                <view class="title-bar"></view>
-                <text>健康小贴士</text>
-            </view>
-            <view class="tips-content">
-                <text class="tips-subtitle">{{ resultInfo?.suggest?.title }}</text>
-                <view
-                    v-for="(suggest, index) in resultInfo?.suggest?.suggestes"
-                    :key="index"
-                    class="tip-item">
-                    <text class="tip-number">{{ index + 1 }}.</text>
-                    <text class="tip-text">{{ suggest }}</text>
+            <!-- 结果区域 -->
+            <view class="result-section">
+                <text class="result-title">{{ resultInfo?.scoreText }}</text>
+                <view class="score-circle">
+                    <text class="score">{{ resultInfo?.score }}</text>
+                    <text class="unit">分</text>
                 </view>
             </view>
-        </view>
 
-        <!-- 底部按钮 -->
-        <view class="footer">
-            <button class="back-btn" @tap="goBack">返回首页</button>
-            <button class="share-btn" @tap="shareResult">邀请朋友测一测</button>
-        </view>
+            <!-- 结果概述 -->
+            <view class="result-content">
+                <view class="section-title">测评结果概述</view>
+                <view class="result-desc">
+                    您的结果区间在 ({{ resultInfo?.score - 7 }}, {{ resultInfo?.score + 7 }})，
+                    {{ resultInfo?.scoreText }}，一定要看心理医生或精神科医生。
+                </view>
+
+                <!-- 添加分割线 -->
+                <view class="divider"></view>
+
+                <!-- 免责声明 -->
+                <view class="disclaimer"> 此测试结果仅供参考，不能代替医生诊断 </view>
+            </view>
+
+            <!-- 健康小贴士 -->
+            <view v-if="resultInfo?.suggest" class="tips-section">
+                <view class="section-title">
+                    <view class="title-bar"></view>
+                    <text>健康小贴士</text>
+                </view>
+                <view class="tips-content">
+                    <text class="tips-subtitle">{{ resultInfo?.suggest?.title }}</text>
+                    <view
+                        v-for="(suggest, index) in resultInfo?.suggest?.suggestes"
+                        :key="index"
+                        class="tip-item">
+                        <text class="tip-number">{{ index + 1 }}.</text>
+                        <text class="tip-text">{{ suggest }}</text>
+                    </view>
+                </view>
+            </view>
+
+            <!-- 底部按钮 -->
+            <view class="footer">
+                <button class="back-btn" @tap="goBack">返回首页</button>
+                <button class="share-btn" @tap="shareResult">邀请朋友测一测</button>
+            </view>
+        </template>
     </view>
 </template>
 
@@ -62,24 +70,87 @@ import { useStore } from '@/store'
 import type { ResultItem } from '@/types/test'
 import manifest from '@/manifest.json'
 
+const RESULT_API = 'https://purre-green-1309961435.cos.ap-chengdu.myqcloud.com/Scale/results'
+
 export default defineComponent({
     name: 'TestResult',
     setup() {
         const store = useStore()
         const resultInfo = ref<ResultItem>()
+        const isLoading = ref(false)
 
-        onLoad((options: any) => {
-            const { id } = options
-            // 从 store 中获取结果
-            const result = store.state.test.historyResults.find((item) => item.id === id)
-            console.log('result', result)
-                
-            if (result) {
+        // 从服务器获取测试结果
+        const fetchTestResult = async (testId: string): Promise<any> => {
+            const response = await uni.request({
+                url: `${RESULT_API}/${testId}.json`,
+                method: 'GET',
+                header: {
+                    'Cache-Control': 'no-cache',
+                },
+            })
+
+            if (response.statusCode === 200 && response.data) {
+                return response.data
+            }
+            throw new Error('Failed to fetch test result')
+        }
+
+        onLoad(async (options: any) => {
+            const { type, id } = options
+            console.log('type', type)
+
+            if (type === 'test') {
+                isLoading.value = true
+                try {
+                    const test = store.state.test.testItems.find((item) => item.id === id)
+                    if (test) {
+                        // 获取测试结果
+                        const result = await fetchTestResult(id)
+
+                        // 生成结果对象
+                        const resultItem: ResultItem = {
+                            id: Date.now().toString(),
+                            test: {
+                                id: test.id,
+                                name: test.name,
+                                description: test.description,
+                                userCount: test.userCount,
+                                questionCount: test.questionCount,
+                                duration: test.duration,
+                                type: test.type,
+                                source: test.source,
+                                soloChoice: test.soloChoice,
+                            },
+                            introTexts: result.introTexts || '',
+                            completedDate: Date.now(),
+                            score: result.score,
+                            scoreText: result.scoreText,
+                            suggest: result.suggest || test.suggest,
+                        }
+
+                        // 保存到 store
+                        store.dispatch('test/addTestResult', resultItem)
+                        resultInfo.value = resultItem
+
+                        // 设置导航栏标题
+                        uni.setNavigationBarTitle({
+                            title: test.name,
+                        })
+                    }
+                } catch (e) {
+                    console.error('获取测试结果失败:', e)
+                    uni.showToast({
+                        title: '获取结果失败',
+                        icon: 'none',
+                    })
+                } finally {
+                    // isLoading.value = false
+                }
+            } else if (type === 'history') {
+                const result = store.state.test.historyResults.find(
+                    (item: ResultItem) => item.id === id
+                )
                 resultInfo.value = result
-                // 设置导航栏标题
-                uni.setNavigationBarTitle({
-                    title: result.test.name,
-                })
             }
         })
 
@@ -98,6 +169,7 @@ export default defineComponent({
         return {
             manifest,
             resultInfo,
+            isLoading,
             shareResult,
             goBack,
         }
@@ -274,6 +346,18 @@ export default defineComponent({
     .share-btn {
         background: #4080ff;
         color: #fff;
+    }
+}
+
+.loading-state {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text {
+        font-size: 32rpx;
+        color: #666;
     }
 }
 </style>

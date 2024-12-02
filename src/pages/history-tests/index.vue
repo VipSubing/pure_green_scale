@@ -42,7 +42,7 @@ export default defineComponent({
 
         const viewResult = (resultId: string) => {
             uni.navigateTo({
-                url: `/pages/test-result/index?id=${resultId}`,
+                url: `/pages/test-result/index?type=history&id=${resultId}`,
             })
         }
 
