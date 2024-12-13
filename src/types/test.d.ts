@@ -7,7 +7,7 @@ export interface TestPaperItem {
     questionCount: number
     duration: number
     isNew?: boolean
-    type: 'depressed' | 'anxiety' | 'sleep' | 'personality'
+    type: 'depressed' | 'anxiety' |  'personality'
     source?: string
     items?: TestItem[]
     soloChoice: boolean
@@ -37,4 +37,16 @@ export interface ResultItem {
 export interface ResultSuggest {
     title: string
     suggestes: string[]
+}
+
+export interface ComputeResult {
+    score: number
+    level: string
+    summary: string
+}
+
+export interface ResultResponse {
+    code: number
+    message: string
+    data: any
 }

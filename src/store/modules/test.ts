@@ -143,8 +143,6 @@ export default {
             commit('UPDATE_TEST_ITEM', test)
         },
         addTestResult({ commit }: { commit: any }, result: ResultItem) {
-            console.log('addTestResult')
-            console.log(JSON.stringify(result))
             commit('ADD_TEST_RESULT', result)
         },
         // 添加新的 action 用于加载历史记录

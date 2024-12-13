@@ -147,7 +147,7 @@ export default defineComponent({
                 console.error('Failed to load resources:', e)
                 uni.showToast({
                     title: '资源加载失败',
-                    icon: 'none'
+                    icon: 'none',
                 })
             } finally {
                 isLoading.value = false

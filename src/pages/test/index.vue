@@ -168,20 +168,11 @@ export default defineComponent({
             if (!testPaper.value) return
 
             try {
-                let finalScore = 0
-
-                // 计算总分
-                testPaper.value.items?.forEach((item) => {
-                    item.answers.forEach((answer) => {
-                        if (answer.selected) {
-                            finalScore += answer.score
-                        }
-                    })
-                })
-
-                // 直接跳转到结果页面，传递必要参数
+                // 跳转到结果页面，传递答题数据
                 uni.navigateTo({
-                    url: `/pages/test-result/index?type=test&id=${testPaper.value.id}`,
+                    url: `/pages/test-result/index?type=test&id=${
+                        testPaper.value.id
+                    }&testJson=${encodeURIComponent(JSON.stringify(testPaper.value))}`,
                 })
             } catch (e) {
                 console.error('计算分数时出错:', e)

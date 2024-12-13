@@ -15,16 +15,23 @@
                 </view>
                 <view class="user-count">{{ test.userCount }}万人测过</view>
             </view>
-            <image
-                :src="`/static/images/avatar-${test.type}.png`"
-                mode="aspectFit"
-                class="card-image" />
+            <view class="image-container">
+                <image
+                    :src="`/static/images/${
+                        ['depressed', 'anxiety', 'personality'].includes(test.type)
+                            ? test.type
+                            : 'type_all'
+                    }.png`"
+                    mode="aspectFit"
+                    class="card-image" />
+            </view>
         </view>
     </view>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent } from 'vue'
+import type { PropType } from 'vue'
 import type { TestPaperItem } from '@/types/test'
 
 export default defineComponent({
@@ -55,7 +62,6 @@ export default defineComponent({
     gap: 20rpx;
 
     .test-card {
-        height: 240rpx;
         background: #fff;
         border-radius: 16rpx;
         padding: 30rpx;
@@ -69,7 +75,7 @@ export default defineComponent({
             font-size: 32rpx;
             font-weight: 500;
             color: #333;
-            margin-bottom: 10rpx;
+            margin-bottom: 20rpx;
         }
 
         .card-meta {
@@ -85,15 +91,25 @@ export default defineComponent({
         .user-count {
             font-size: 24rpx;
             color: #999;
-            margin-top: 10rpx;
+            margin-top: 20rpx;
         }
 
-        .card-image {
-            width: 120rpx;
-            height: 120rpx;
+        .image-container {
             position: absolute;
             right: 30rpx;
             bottom: 30rpx;
+            width: 120rpx;
+            height: 120rpx;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-image {
+            margin-bottom: -40rpx;
+            width: 100%;
+            height: 100%;
         }
 
         .new-tag {

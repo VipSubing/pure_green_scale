@@ -1,11 +1,10 @@
 <template>
     <view class="nav-tabs">
-        <view 
-            v-for="(tab, index) in tabs" 
+        <view
+            v-for="(tab, index) in tabs"
             :key="index"
             :class="['tab-item', currentTab === index ? 'active' : '']"
-            @tap="switchTab(index)"
-        >
+            @tap="switchTab(index)">
             {{ tab }}
         </view>
     </view>
@@ -19,12 +18,12 @@ export default defineComponent({
     props: {
         tabs: {
             type: Array as () => string[],
-            required: true
+            required: true,
         },
         currentTab: {
             type: Number,
-            required: true
-        }
+            required: true,
+        },
     },
     emits: ['update:currentTab'],
     setup(props, { emit }) {
@@ -33,9 +32,9 @@ export default defineComponent({
         }
 
         return {
-            switchTab
+            switchTab,
         }
-    }
+    },
 })
 </script>
 
@@ -49,7 +48,7 @@ export default defineComponent({
     .tab-item {
         position: relative;
         padding: 20rpx 40rpx;
-        font-size: 28rpx;
+        font-size: 35rpx;
         color: #666;
 
         &.active {
@@ -69,4 +68,4 @@ export default defineComponent({
         }
     }
 }
-</style> 
+</style>

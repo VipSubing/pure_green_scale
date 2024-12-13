@@ -10,7 +10,7 @@
                 <text class="title">心理测评</text>
                 <view class="subtitle">
                     <image src="/static/logo.png" mode="aspectFit" class="check-icon" />
-                    <text>纯绿色，不收费，无广告，无套路</text>
+                    <text>纯绿色，不收费，无广告</text>
                 </view>
             </view>
 
@@ -29,10 +29,16 @@
                             <text>{{ proTest.duration }}分钟</text>
                         </view>
                     </view>
-                    <image
-                        src="/static/images/avatar-pro.png"
-                        mode="aspectFit"
-                        class="card-image" />
+                    <view class="image-container">
+                        <image
+                            :src="`/static/images/${
+                                ['depressed', 'anxiety', 'personality'].includes(proTest.type)
+                                    ? proTest.type
+                                    : 'type_all'
+                            }.png`"
+                            mode="aspectFill"
+                            class="card-image" />
+                    </view>
                 </view>
 
                 <!-- 其他测评卡片网格 -->
@@ -89,7 +95,6 @@ export default defineComponent({
 .content-scroll {
     flex: 1;
     padding: 30rpx;
-    // box-sizing: border-box;
     padding-bottom: 120rpx;
     .test-header {
         padding: 30rpx;
@@ -125,10 +130,17 @@ export default defineComponent({
     padding: 30rpx;
     margin-bottom: 20rpx;
     position: relative;
+    display: flex;
+    flex-direction: row;
+    height: 240rpx;
 
     &.pro-card {
         .card-content {
-            flex: 1;
+            flex: 3;
+            padding-right: 20rpx;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
         }
 
         .card-title {
@@ -149,7 +161,6 @@ export default defineComponent({
             overflow: hidden;
             text-overflow: ellipsis;
             line-height: 1.5;
-            max-height: calc(26rpx * 1.5 * 3);
         }
 
         .card-meta {
@@ -162,12 +173,23 @@ export default defineComponent({
             }
         }
 
+        .image-container {
+            flex: 1.2;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            // background-color: blue;
+            // min-width: 200rpx;
+            // max-width: 200rpx;
+        }
+
         .card-image {
-            width: 160rpx;
-            height: 160rpx;
             position: absolute;
-            right: 30rpx;
-            bottom: 30rpx;
+            height: 200rpx;
+            width: 280rpx;
+            margin-right: 20rpx;
         }
     }
 }

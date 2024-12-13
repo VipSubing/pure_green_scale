@@ -25,8 +25,7 @@
             <view class="result-content">
                 <view class="section-title">测评结果概述</view>
                 <view class="result-desc">
-                    您的结果区间在 ({{ resultInfo?.score - 7 }}, {{ resultInfo?.score + 7 }})，
-                    {{ resultInfo?.scoreText }}，一定要看心理医生或精神科医生。
+                    {{ resultInfo?.introTexts }}
                 </view>
 
                 <!-- 添加分割线 -->
@@ -67,10 +66,10 @@
 import { defineComponent, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useStore } from '@/store'
-import type { ResultItem } from '@/types/test'
+import type { ResultItem, ComputeResult, ResultResponse } from '@/types/test'
 import manifest from '@/manifest.json'
 
-const RESULT_API = 'https://purre-green-1309961435.cos.ap-chengdu.myqcloud.com/Scale/results'
+const RESULT_API = 'http://10.31.11.188:8080/scale/compute'
 
 export default defineComponent({
     name: 'TestResult',
@@ -80,32 +79,49 @@ export default defineComponent({
         const isLoading = ref(false)
 
         // 从服务器获取测试结果
-        const fetchTestResult = async (testId: string): Promise<any> => {
+        const fetchTestResult = async (testId: string, items: any[]): Promise<ComputeResult> => {
             const response = await uni.request({
-                url: `${RESULT_API}/${testId}.json`,
-                method: 'GET',
+                url: RESULT_API,
+                method: 'POST',
+                data: {
+                    items,
+                    id: testId,
+                },
                 header: {
-                    'Cache-Control': 'no-cache',
+                    'content-type': 'application/json',
                 },
             })
-
+            console.log('response', response)
             if (response.statusCode === 200 && response.data) {
-                return response.data
+                const resultResponse = response.data as ResultResponse
+                if (resultResponse.code === 200) {
+                    // 如果返回的是字符串，需要解析
+                    const resultData =
+                        typeof resultResponse.data === 'string'
+                            ? JSON.parse(resultResponse.data)
+                            : resultResponse.data
+
+                    return resultData as ComputeResult
+                }
             }
             throw new Error('Failed to fetch test result')
         }
 
         onLoad(async (options: any) => {
-            const { type, id } = options
-            console.log('type', type)
+            const { type, id, testJson } = options
+            console.log('type', type, 'id', id)
 
             if (type === 'test') {
                 isLoading.value = true
                 try {
-                    const test = store.state.test.testItems.find((item) => item.id === id)
-                    if (test) {
+                    if (testJson) {
+                        // 解码并解析测试数据
+                        const decodedJson = decodeURIComponent(testJson)
+                        const test = JSON.parse(decodedJson)
+
                         // 获取测试结果
-                        const result = await fetchTestResult(id)
+                        const result = await fetchTestResult(id, test.items)
+                        console.log('result', result)
 
                         // 生成结果对象
                         const resultItem: ResultItem = {
@@ -121,11 +137,11 @@ export default defineComponent({
                                 source: test.source,
                                 soloChoice: test.soloChoice,
                             },
-                            introTexts: result.introTexts || '',
+                            introTexts: result.summary,
                             completedDate: Date.now(),
                             score: result.score,
-                            scoreText: result.scoreText,
-                            suggest: result.suggest || test.suggest,
+                            scoreText: result.level,
+                            suggest: test.suggest,
                         }
 
                         // 保存到 store
@@ -144,7 +160,7 @@ export default defineComponent({
                         icon: 'none',
                     })
                 } finally {
-                    // isLoading.value = false
+                    isLoading.value = false
                 }
             } else if (type === 'history') {
                 const result = store.state.test.historyResults.find(
