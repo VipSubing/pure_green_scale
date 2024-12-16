@@ -64,6 +64,7 @@ export default defineComponent({
     right: 0;
     z-index: 100;
     background: #fff;
+    height: 100rpx;
     /* 导航栏下方添加阴影 */
     box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
 }

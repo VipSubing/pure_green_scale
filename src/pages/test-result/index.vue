@@ -15,6 +15,10 @@
         <scroll-view
             scroll-y
             class="content-scroll"
+            :bounces="true"
+            :enable-flex="true"
+            :enhanced="true"
+            :show-scrollbar="false"
             :style="{ height: 'calc(100vh - 44px - var(--status-bar-height) - 128rpx)' }">
             <!-- 加载状态 -->
             <view v-if="isLoading" class="loading-state">
@@ -22,7 +26,7 @@
             </view>
 
             <!-- 结果内容 -->
-            <template v-else>
+            <view v-else class="content">
                 <!-- 头部标题 -->
                 <view class="header">
                     <text class="title">{{ manifest.name }} · 测评结果</text>
@@ -72,7 +76,8 @@
                         </view>
                     </view>
                 </view>
-            </template>
+            </view>
+            <!-- <view style="height: 50rpx"/> -->
         </scroll-view>
 
         <!-- 底部按钮 -->
@@ -242,10 +247,13 @@ export default defineComponent({
     box-sizing: border-box;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding: 30rpx;
-    padding-bottom: 0;
-    // margin-top: calc(44px + var(--status-bar-height));
+    margin-top: 91px;
+    margin-bottom: calc(100rpx + env(safe-area-inset-bottom));
     background: #f5f6fa;
+}
+.content {
+    padding: 0 30rpx;
+    padding-bottom: 50rpx;
 }
 
 .header {
@@ -261,12 +269,17 @@ export default defineComponent({
 }
 
 .result-section {
+    padding: 50rpx 0;
     background: #fff;
     border-radius: 20rpx;
     // padding: 40rpx;
     text-align: center;
     margin-bottom: 30rpx;
-
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 30rpx;
     .result-title {
         font-size: 50rpx;
         color: #4080ff;
@@ -279,7 +292,6 @@ export default defineComponent({
         height: 200rpx;
         border-radius: 50%;
         border: 8rpx solid #4080ff;
-        margin: 0 auto;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -301,8 +313,8 @@ export default defineComponent({
 .result-content {
     background: #fff;
     border-radius: 20rpx;
-    // padding: 40rpx;
-    margin-bottom: 80rpx;
+    padding: 40rpx;
+    margin-bottom: 30rpx;
 
     .result-desc {
         font-size: 28rpx;
@@ -344,9 +356,7 @@ export default defineComponent({
 .tips-section {
     background: #fff;
     border-radius: 20rpx;
-    // padding: 40rpx;
-    margin-bottom: 120rpx;
-
+    padding: 40rpx;
     .tips-subtitle {
         font-size: 28rpx;
         color: #666;
@@ -384,28 +394,34 @@ export default defineComponent({
 }
 .footer {
     padding: 20rpx 30rpx;
+    padding-bottom: env(safe-area-inset-bottom);
     display: flex;
-    gap: 20rpx;
     background: #fff;
-
-    .back-btn,
-    .share-btn {
-        flex: 1;
-        height: 88rpx;
-        line-height: 88rpx;
-        border-radius: 44rpx;
-        font-size: 32rpx;
-        text-align: center;
-    }
+    box-sizing: border-box;
 
     .back-btn {
+        flex: 1;
+        font-size: 30rpx;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+        border-radius: 10rpx 0 0 10rpx;
+        height: 80rpx;
         background: #f5f6fa;
         color: #666;
     }
 
     .share-btn {
+        flex: 1;
+        font-size: 30rpx;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+        height: 80rpx;
+
         background: #4080ff;
         color: #fff;
+        border-radius: 0 10rpx 10rpx 0;
     }
 }
 

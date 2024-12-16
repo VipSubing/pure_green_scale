@@ -42,6 +42,7 @@ export default defineComponent({
 .nav-tabs {
     display: flex;
     padding: 20rpx 40rpx;
+    padding-bottom: 0;
     background: #fff;
     border-bottom: 1rpx solid #eee;
 
@@ -58,7 +59,7 @@ export default defineComponent({
             &::after {
                 content: '';
                 position: absolute;
-                bottom: -20rpx;
+                bottom: 0rpx;
                 left: 40rpx;
                 right: 40rpx;
                 height: 4rpx;
