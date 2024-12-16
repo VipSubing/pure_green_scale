@@ -1,64 +1,87 @@
 <template>
-    <view class="result-page">
-        <!-- 加载状态 -->
-        <view v-if="isLoading" class="loading-state">
-            <text>计算结果中...</text>
+    <view class="container">
+        <!-- 固定导航栏 -->
+        <view class="nav-fixed">
+            <uni-nav-bar
+                :fixed="true"
+                status-bar
+                :leftIcon="page_type === 'test' ? '' : 'left'"
+                :border="false"
+                :title="page_title"
+                @clickLeft="goBack" />
         </view>
 
-        <!-- 结果内容 -->
-        <template v-else>
-            <!-- 头部标题 -->
-            <view class="header">
-                <text class="title">{{ manifest.name }} · 测评结果</text>
+        <!-- 可滚动内容区域 -->
+        <scroll-view
+            scroll-y
+            class="content-scroll"
+            :style="{ height: 'calc(100vh - 44px - var(--status-bar-height) - 128rpx)' }">
+            <!-- 加载状态 -->
+            <view v-if="isLoading" class="loading-state">
+                <text>计算结果中...</text>
             </view>
 
-            <!-- 结果区域 -->
-            <view class="result-section">
-                <text class="result-title">{{ resultInfo?.scoreText }}</text>
-                <view class="score-circle">
-                    <text class="score">{{ resultInfo?.score }}</text>
-                    <text class="unit">分</text>
-                </view>
-            </view>
-
-            <!-- 结果概述 -->
-            <view class="result-content">
-                <view class="section-title">测评结果概述</view>
-                <view class="result-desc">
-                    {{ resultInfo?.introTexts }}
+            <!-- 结果内容 -->
+            <template v-else>
+                <!-- 头部标题 -->
+                <view class="header">
+                    <text class="title">{{ manifest.name }} · 测评结果</text>
                 </view>
 
-                <!-- 添加分割线 -->
-                <view class="divider"></view>
-
-                <!-- 免责声明 -->
-                <view class="disclaimer"> 此测试结果仅供参考，不能代替医生诊断 </view>
-            </view>
-
-            <!-- 健康小贴士 -->
-            <view v-if="resultInfo?.suggest" class="tips-section">
-                <view class="section-title">
-                    <view class="title-bar"></view>
-                    <text>健康小贴士</text>
-                </view>
-                <view class="tips-content">
-                    <text class="tips-subtitle">{{ resultInfo?.suggest?.title }}</text>
-                    <view
-                        v-for="(suggest, index) in resultInfo?.suggest?.suggestes"
-                        :key="index"
-                        class="tip-item">
-                        <text class="tip-number">{{ index + 1 }}.</text>
-                        <text class="tip-text">{{ suggest }}</text>
+                <!-- 结果区域 -->
+                <view class="result-section">
+                    <view class="result-title">{{ resultInfo?.scoreText }}</view>
+                    <view class="score-circle">
+                        <text class="score">{{ resultInfo?.score }}</text>
+                        <text class="unit">分</text>
                     </view>
                 </view>
-            </view>
 
-            <!-- 底部按钮 -->
+                <!-- 结果概述 -->
+                <view class="result-content">
+                    <view class="section-title">
+                        <view class="title-bar"></view>
+                        <view>测评结果概述</view>
+                    </view>
+
+                    <view class="result-desc">
+                        {{ resultInfo?.introTexts }}
+                    </view>
+
+                    <!-- 添加分割线 -->
+                    <view class="divider"></view>
+
+                    <!-- 免责声明 -->
+                    <view class="disclaimer"> 此测试结果仅供参考，不能代替医生诊断 </view>
+                </view>
+
+                <!-- 健康小贴士 -->
+                <view v-if="resultInfo?.suggest" class="tips-section">
+                    <view class="section-title">
+                        <view class="title-bar"></view>
+                        <text>健康小贴士</text>
+                    </view>
+                    <view class="tips-content">
+                        <text class="tips-subtitle">{{ resultInfo?.suggest?.title }}</text>
+                        <view
+                            v-for="(suggest, index) in resultInfo?.suggest?.suggestes"
+                            :key="index"
+                            class="tip-item">
+                            <text class="tip-number">{{ index + 1 }}.</text>
+                            <text class="tip-text">{{ suggest }}</text>
+                        </view>
+                    </view>
+                </view>
+            </template>
+        </scroll-view>
+
+        <!-- 底部按钮 -->
+        <view class="footer-fixed">
             <view class="footer">
                 <button class="back-btn" @tap="goBack">返回首页</button>
                 <button class="share-btn" @tap="shareResult">邀请朋友测一测</button>
             </view>
-        </template>
+        </view>
     </view>
 </template>
 
@@ -69,7 +92,7 @@ import { useStore } from '@/store'
 import type { ResultItem, ComputeResult, ResultResponse } from '@/types/test'
 import manifest from '@/manifest.json'
 
-const RESULT_API = 'http://10.31.11.188:8080/scale/compute'
+const RESULT_API = 'http://subing.site/scale/compute'
 
 export default defineComponent({
     name: 'TestResult',
@@ -77,6 +100,8 @@ export default defineComponent({
         const store = useStore()
         const resultInfo = ref<ResultItem>()
         const isLoading = ref(false)
+        const page_type = ref('')
+        const page_title = ref('')
 
         // 从服务器获取测试结果
         const fetchTestResult = async (testId: string, items: any[]): Promise<ComputeResult> => {
@@ -110,7 +135,7 @@ export default defineComponent({
         onLoad(async (options: any) => {
             const { type, id, testJson } = options
             console.log('type', type, 'id', id)
-
+            page_type.value = type
             if (type === 'test') {
                 isLoading.value = true
                 try {
@@ -118,6 +143,7 @@ export default defineComponent({
                         // 解码并解析测试数据
                         const decodedJson = decodeURIComponent(testJson)
                         const test = JSON.parse(decodedJson)
+                        page_title.value = test.name || '测试结果'
 
                         // 获取测试结果
                         const result = await fetchTestResult(id, test.items)
@@ -147,11 +173,6 @@ export default defineComponent({
                         // 保存到 store
                         store.dispatch('test/addTestResult', resultItem)
                         resultInfo.value = resultItem
-
-                        // 设置导航栏标题
-                        uni.setNavigationBarTitle({
-                            title: test.name,
-                        })
                     }
                 } catch (e) {
                     console.error('获取测试结果失败:', e)
@@ -166,6 +187,8 @@ export default defineComponent({
                 const result = store.state.test.historyResults.find(
                     (item: ResultItem) => item.id === id
                 )
+                page_title.value = result?.test.name || '测试结果'
+
                 resultInfo.value = result
             }
         })
@@ -186,22 +209,49 @@ export default defineComponent({
             manifest,
             resultInfo,
             isLoading,
+            page_title,
             shareResult,
             goBack,
+            page_type,
         }
     },
 })
 </script>
 
 <style lang="scss">
-.result-page {
-    min-height: 100vh;
-    background: #f5f6fa;
+.container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    // overflow: hidden;
+}
+
+.nav-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: #fff;
+}
+
+.content-scroll {
+    flex: 1;
+    box-sizing: border-box;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: 30rpx;
+    padding-bottom: 0;
+    // margin-top: calc(44px + var(--status-bar-height));
+    background: #f5f6fa;
 }
 
 .header {
-    margin-bottom: 40rpx;
+    margin: 30rpx 0;
+    // margin-top: 20rpx;
+    // margin-bottom: 40rpx;
 
     .title {
         font-size: 36rpx;
@@ -213,15 +263,15 @@ export default defineComponent({
 .result-section {
     background: #fff;
     border-radius: 20rpx;
-    padding: 40rpx;
+    // padding: 40rpx;
     text-align: center;
     margin-bottom: 30rpx;
 
     .result-title {
-        font-size: 40rpx;
-        color: #333;
+        font-size: 50rpx;
+        color: #4080ff;
         font-weight: bold;
-        margin-bottom: 30rpx;
+        margin-bottom: 20rpx;
     }
 
     .score-circle {
@@ -251,14 +301,8 @@ export default defineComponent({
 .result-content {
     background: #fff;
     border-radius: 20rpx;
-    padding: 40rpx;
-    margin-bottom: 30rpx;
-
-    .section-title {
-        font-size: 32rpx;
-        color: #4080ff;
-        margin-bottom: 20rpx;
-    }
+    // padding: 40rpx;
+    margin-bottom: 80rpx;
 
     .result-desc {
         font-size: 28rpx;
@@ -279,32 +323,29 @@ export default defineComponent({
         text-align: center;
     }
 }
+.section-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30rpx;
+    .title-bar {
+        width: 6rpx;
+        height: 32rpx;
+        background: #4080ff;
+        border-radius: 3rpx;
+        margin-right: 16rpx;
+    }
+    text {
+        font-size: 32rpx;
+        color: #333;
+        font-weight: 500;
+    }
+}
 
 .tips-section {
     background: #fff;
     border-radius: 20rpx;
-    padding: 40rpx;
+    // padding: 40rpx;
     margin-bottom: 120rpx;
-
-    .section-title {
-        display: flex;
-        align-items: center;
-        margin-bottom: 30rpx;
-
-        .title-bar {
-            width: 6rpx;
-            height: 32rpx;
-            background: #4080ff;
-            border-radius: 3rpx;
-            margin-right: 16rpx;
-        }
-
-        text {
-            font-size: 32rpx;
-            color: #333;
-            font-weight: 500;
-        }
-    }
 
     .tips-subtitle {
         font-size: 28rpx;
@@ -333,12 +374,15 @@ export default defineComponent({
         }
     }
 }
-
-.footer {
+.footer-fixed {
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
+    background: #fff;
+    z-index: 100;
+}
+.footer {
     padding: 20rpx 30rpx;
     display: flex;
     gap: 20rpx;
