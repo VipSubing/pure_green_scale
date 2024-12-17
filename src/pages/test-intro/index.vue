@@ -307,6 +307,8 @@ export default defineComponent({
     align-items: center;
     gap: 20rpx;
     padding: 20rpx 30rpx;
+    padding-bottom: calc(constant(safe-area-inset-bottom)); /* iOS 11.2 之前 */
+    padding-bottom: calc(env(safe-area-inset-bottom)); /* iOS 11.2 及以后 */
     background: #fff;
     border-top: 1rpx solid #eee;
 
@@ -320,7 +322,7 @@ export default defineComponent({
         border-radius: 44rpx;
         font-size: 28rpx;
         color: #666;
-
+        border: none;
         .share-icon {
             width: 36rpx;
             height: 36rpx;
@@ -337,6 +339,7 @@ export default defineComponent({
         color: #fff;
         font-size: 32rpx;
         border-radius: 44rpx;
+        border: 1rpx solid #4080ff;
         text-align: center;
 
         .tag {

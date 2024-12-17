@@ -86,7 +86,7 @@ export default defineComponent({
 
 <style lang="scss">
 .test-area {
-    height: 100vh;
+    height: 100%;
     overflow: visible;
     display: flex;
     flex-direction: column;
@@ -94,6 +94,7 @@ export default defineComponent({
 
 .content-scroll {
     flex: 1;
+    box-sizing: border-box;
     padding: 30rpx;
     padding-bottom: 120rpx;
     .test-header {

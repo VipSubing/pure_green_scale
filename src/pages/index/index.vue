@@ -71,6 +71,7 @@ export default defineComponent({
 
 .content {
     flex: 1;
+    box-sizing: border-box;
     /* 设置内容区域的上边距，值为导航栏的高度 */
     margin-top: 100rpx; /* 根据实际导航栏高度调整 */
     height: calc(100vh - 100rpx); /* 减去导航栏高度 */

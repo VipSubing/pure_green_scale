@@ -71,7 +71,7 @@ export default defineComponent({
 
 <style lang="scss">
 .all-tests {
-    height: 100vh;
+    height: 100%;
     display: flex;
     flex-direction: column;
     background: #f5f6fa;
@@ -124,6 +124,8 @@ export default defineComponent({
 
 .test-list {
     padding: 20rpx;
+    padding-bottom: calc(0rpx + constant(safe-area-inset-bottom)); /* iOS 11.2 之前 */
+    padding-bottom: calc(00rpx + env(safe-area-inset-bottom)); /* iOS 11.2 及以后 */
 
     .test-item {
         display: flex;

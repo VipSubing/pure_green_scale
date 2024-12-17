@@ -230,13 +230,13 @@ export default defineComponent({
     gap: 20rpx; // 添加此行，控制元素间距
 
     .progress-text {
-        font-size: 24rpx;
-        color: #666;
+        font-size: 30rpx;
+        color: #333;
         white-space: nowrap; // 防止文字换行
     }
 
     .progress-track {
-        height: 8rpx;
+        height: 12rpx;
         background: #e0e0e0;
         border-radius: 4rpx;
         overflow: hidden;
@@ -250,7 +250,7 @@ export default defineComponent({
 
     .progress-count {
         color: #4080ff;
-        font-size: 24rpx;
+        font-size: 30rpx;
         white-space: nowrap; // 防止文字换行
     }
 }
@@ -259,7 +259,7 @@ export default defineComponent({
     flex: 1;
     height: 0; // 让滚动区域自适应剩余高度
     padding: 30rpx;
-    padding-top: 10rpx;
+    padding-top: 30rpx;
     padding-bottom: 140rpx; // 为底部按钮预留空间
     box-sizing: border-box;
 }

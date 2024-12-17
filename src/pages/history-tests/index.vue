@@ -1,7 +1,13 @@
 <template>
     <view class="history-tests">
         <!-- 历史测评列表 -->
-        <scroll-view scroll-y :show-scrollbar="false" class="history-list-scroll">
+        <scroll-view
+            scroll-y
+            :bounces="true"
+            :enable-flex="true"
+            :enhanced="true"
+            :show-scrollbar="false"
+            class="history-list-scroll">
             <view class="history-list">
                 <view v-for="result in historyList" :key="result.id" class="history-item">
                     <view class="test-info">
@@ -10,13 +16,11 @@
                             测试完成时间 {{ formatDate(result.completedDate) }}
                         </text>
                     </view>
-                    <view class="result-action">
-                        <text class="view-result" @tap="viewResult(result.id)">查看结果</text>
-                    </view>
+                    <button class="view-result" @tap="viewResult(result.id)">查看结果</button>
                 </view>
             </view>
-        </scroll-view>
-    </view>
+        </scroll-view> </view
+    > 
 </template>
 
 <script lang="ts">
@@ -57,7 +61,7 @@ export default defineComponent({
 
 <style lang="scss">
 .history-tests {
-    height: 100vh;
+    height: 100%;
     display: flex;
     flex-direction: column;
     background: #f5f6fa;
@@ -66,14 +70,12 @@ export default defineComponent({
 .history-list-scroll {
     flex: 1;
     height: 0;
-
-    &::-webkit-scrollbar {
-        display: none;
-    }
 }
 
 .history-list {
     padding: 20rpx;
+    padding-bottom: calc(0rpx + constant(safe-area-inset-bottom)); /* iOS 11.2 之前 */
+    padding-bottom: calc(00rpx + env(safe-area-inset-bottom)); /* iOS 11.2 及以后 */
 
     .history-item {
         display: flex;
@@ -101,10 +103,20 @@ export default defineComponent({
             }
         }
 
-        .result-action {
-            .view-result {
-                font-size: 28rpx;
-                color: #4080ff;
+        .view-result {
+            margin: 0;
+            min-width: 160rpx;
+            height: 64rpx;
+            line-height: 64rpx;
+            font-size: 28rpx;
+            color: #fff;
+            background: #4080ff;
+            border-radius: 32rpx;
+            padding: 0 30rpx;
+            border: none;
+            
+            &::after {
+                border: none;
             }
         }
     }
