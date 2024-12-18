@@ -113,8 +113,9 @@ export default defineComponent({
 }
 .big-box {
     padding: 30rpx;
+    padding-bottom: 40rpx;
     border-radius: 20rpx;
-    background: linear-gradient(180deg, #e8f5e9 0%, #ffffff 100%);
+    background: linear-gradient(180deg, #7fde87 0%, #ffffff 100%);
     // box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 .test-header {

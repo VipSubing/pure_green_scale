@@ -84,7 +84,7 @@
         <view class="footer-fixed">
             <view class="footer">
                 <button class="back-btn" @tap="goBack">返回首页</button>
-                <button class="share-btn" @tap="shareResult">邀请朋友测一测</button>
+                <button type="primary" class="share-btn" @tap="shareResult">邀请朋友测一测</button>
             </view>
         </view>
     </view>
@@ -410,9 +410,7 @@ export default defineComponent({
         text-align: center;
         margin: 0;
         padding: 0;
-        border-radius: $uni-border-radius-lg 0 0 $uni-border-radius-lg;
-        border: none; /* 清除默认边框 */
-        box-shadow: none; /* 清除阴影 */
+        border-radius:  $uni-border-radius-lg;
         height: 80rpx;
         line-height: 80rpx;
         background: $uni-bg-color-grey;
@@ -429,7 +427,7 @@ export default defineComponent({
         line-height: 80rpx;
         background: $uni-color-primary;
         color: $uni-text-color-inverse;
-        border-radius: 0 $uni-border-radius-lg $uni-border-radius-lg 0;
+        border-radius:  $uni-border-radius-lg;
     }
 }
 
