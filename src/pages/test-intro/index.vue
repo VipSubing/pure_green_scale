@@ -32,7 +32,7 @@
                     </view>
                     <view class="info-item">
                         <text class="number">{{ testInfo?.userCount }}</text>
-                        <text class="label">万人</text>
+                        <text class="label">人</text>
                         <text class="desc">已完成测评</text>
                     </view>
                 </view>

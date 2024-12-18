@@ -26,7 +26,7 @@
                                 <view class="card-title">{{ proTest.name }}</view>
                                 <view class="card-desc">{{ proTest.description[0] }}</view>
                                 <view class="card-meta">
-                                    <text>{{ proTest.userCount }}万人测过</text>
+                                    <text>{{ proTest.userCount }}人测过</text>
                                     <text class="divider">/</text>
                                     <text>{{ proTest.questionCount }}题</text>
                                     <text class="divider">/</text>

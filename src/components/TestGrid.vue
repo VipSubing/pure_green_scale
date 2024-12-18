@@ -13,7 +13,9 @@
                     <text class="divider">/</text>
                     <text>{{ test.duration }}分钟</text>
                 </view>
-                <view class="user-count">{{ test.userCount }}万人测过</view>
+                <view class="user-count">
+                    {{ test.userCount }}人测过
+                </view>
             </view>
             <view class="image-container">
                 <image

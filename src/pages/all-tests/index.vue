@@ -21,7 +21,7 @@
                         <view class="test-name">{{ test.name }}</view>
                         <view class="test-meta">
                             <text v-if="test.tested" class="tested-tag">已测过</text>
-                            <text>{{ test.userCount }}万人测过</text>
+                            <text>{{ test.userCount }}人测过</text>
                             <text class="divider">/</text>
                             <text>{{ test.questionCount }}题</text>
                             <text class="divider">/</text>
