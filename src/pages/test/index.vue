@@ -218,57 +218,57 @@ export default defineComponent({
 <style lang="scss">
 .test-page {
     min-height: 100vh;
-    background: #f5f6fa;
+    background: $uni-bg-color-grey;
     display: flex;
     flex-direction: column;
 }
 
 .progress-bar {
-    padding: 30rpx;
-    display: flex; // 添加此行
-    align-items: center; // 添加此行
-    gap: 20rpx; // 添加此行，控制元素间距
+    padding: $uni-spacing-row-lg;
+    display: flex;
+    align-items: center;
+    gap: $uni-spacing-row-lg;
 
     .progress-text {
-        font-size: 30rpx;
-        color: #333;
-        white-space: nowrap; // 防止文字换行
+        font-size: $uni-font-size-base;
+        color: $uni-text-color;
+        white-space: nowrap;
     }
 
     .progress-track {
         height: 12rpx;
-        background: #e0e0e0;
-        border-radius: 4rpx;
+        background: $uni-border-color;
+        border-radius: $uni-border-radius-sm;
         overflow: hidden;
         width: 100%;
         .progress-fill {
             height: 100%;
-            background: #4080ff;
+            background: $uni-color-primary;
             transition: width 0.3s ease;
         }
     }
 
     .progress-count {
-        color: #4080ff;
-        font-size: 30rpx;
-        white-space: nowrap; // 防止文字换行
+        color: $uni-color-primary;
+        font-size: $uni-font-size-base;
+        white-space: nowrap;
     }
 }
 
 .question-scroll {
     flex: 1;
-    height: 0; // 让滚动区域自适应剩余高度
-    padding: 30rpx;
-    padding-top: 30rpx;
-    padding-bottom: 140rpx; // 为底部按钮预留空间
+    height: 0;
+    padding: $uni-spacing-row-lg;
+    padding-top: $uni-spacing-row-lg;
+    padding-bottom: 140rpx;
     box-sizing: border-box;
 }
 
 .question-area {
     flex: 1;
-    background: #fff;
-    border-radius: 20rpx;
-    padding: 30rpx;
+    background: $uni-bg-color;
+    border-radius: $uni-border-radius-lg;
+    padding: $uni-spacing-row-lg;
     box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.3s ease;
 
@@ -278,38 +278,32 @@ export default defineComponent({
 
     .question-text {
         flex: 1;
-        font-size: 32rpx;
-        color: #333;
+        font-size: $uni-font-size-lg;
+        color: $uni-text-color;
         line-height: 1.6;
-        // padding: 20rpx;
-        // background: #f5f6fa;
-        // border-radius: 20rpx;
     }
 
     .answer-list {
-        margin-top: 30rpx;
+        margin-top: $uni-spacing-row-lg;
         .answer-item {
-            padding: 30rpx;
-            background: #f5f6fa;
-            border-radius: 16rpx;
-            margin-bottom: 20rpx;
-            font-size: 30rpx;
-            color: #333;
+            padding: $uni-spacing-row-lg;
+            background: $uni-bg-color-grey;
+            border-radius: $uni-border-radius-lg;
+            margin-bottom: $uni-spacing-col-lg;
+            font-size: $uni-font-size-base;
+            color: $uni-text-color;
             transition: all 0.3s ease;
 
-            // 点击时的高亮效果
             &:active {
-                background: rgba(64, 128, 255, 0.1);
-                color: #4080ff;
+                background: rgba($uni-color-primary, 0.1);
+                color: $uni-color-primary;
             }
 
-            // 选中状态
             &.selected {
-                background: rgba(64, 128, 255, 0.1); // 修改为半透明蓝色
-                color: #4080ff; // 文字改为蓝色
+                background: rgba($uni-color-primary, 0.1);
+                color: $uni-color-primary;
                 position: relative;
 
-                // 添加选中时的左边框标识
                 &::before {
                     content: '';
                     position: absolute;
@@ -317,7 +311,7 @@ export default defineComponent({
                     top: 0;
                     bottom: 0;
                     width: 6rpx;
-                    background: #4080ff; // 边框标识改为蓝色
+                    background: $uni-color-primary;
                     border-radius: 3rpx;
                 }
             }
@@ -326,45 +320,41 @@ export default defineComponent({
 }
 
 .question-type {
-    margin: 10rpx 0;
-    // padding: 0 30rpx;
+    margin: $uni-spacing-col-base 0;
 
     text {
-        font-size: 22rpx;
-        color: #4080ff;
-        background: rgba(64, 128, 255, 0.1);
-        padding: 6rpx 20rpx;
-        border-radius: 10rpx;
+        font-size: $uni-font-size-sm;
+        color: $uni-color-primary;
+        background: rgba($uni-color-primary, 0.1);
+        padding: $uni-spacing-col-sm $uni-spacing-row-lg;
+        border-radius: $uni-border-radius-base;
     }
 }
 
 .footer {
+    margin-bottom: $safe-area-inset-bottom;
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    padding: 20rpx 30rpx;
+    padding: $uni-spacing-col-lg $uni-spacing-row-lg;
     z-index: 100;
     display: flex;
-    gap: 20rpx;
-
-    /* 适配底部安全区域 */
-    padding-bottom: constant(safe-area-inset-bottom);
-    padding-bottom: env(safe-area-inset-bottom);
+    gap: $uni-spacing-row-lg;
 
     .prev-btn {
         flex: 1;
-        margin: 0 20rpx 0 20rpx;
+        margin: 0 $uni-spacing-row-lg 0 $uni-spacing-row-lg;
         height: 88rpx;
-        background: rgba(64, 128, 255, 0.1); // 修改为浅蓝色背景
-        color: #4080ff; // 修改为蓝色文字
-        font-size: 32rpx;
-        border-radius: 22rpx;
+        background: rgba($uni-color-primary, 0.1);
+        color: $uni-color-primary;
+        font-size: $uni-font-size-lg;
+        border-radius: $uni-border-radius-lg;
         text-align: center;
         transition: all 0.3s ease;
 
         &:active {
-            background: rgba(64, 128, 255, 0.2); // 点击时稍微加深
+            background: rgba($uni-color-primary, 0.2);
         }
     }
 
@@ -372,10 +362,10 @@ export default defineComponent({
         flex: 1;
         height: 88rpx;
         line-height: 88rpx;
-        background: #4080ff; // 保持蓝色背景
-        color: #fff;
-        font-size: 32rpx;
-        border-radius: 22rpx;
+        background: $uni-color-primary;
+        color: $uni-text-color-inverse;
+        font-size: $uni-font-size-lg;
+        border-radius: $uni-border-radius-lg;
         text-align: center;
         transition: all 0.3s ease;
 
@@ -384,8 +374,8 @@ export default defineComponent({
         }
 
         &:disabled {
-            background: #ccc;
-            opacity: 0.8;
+            background: $uni-text-color-disable;
+            opacity: $uni-opacity-disabled;
         }
 
         &:active {

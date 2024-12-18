@@ -230,7 +230,6 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     position: relative;
-    // overflow: hidden;
 }
 
 .nav-fixed {
@@ -239,7 +238,7 @@ export default defineComponent({
     left: 0;
     right: 0;
     z-index: 100;
-    background: #fff;
+    background: $uni-bg-color;
 }
 
 .content-scroll {
@@ -248,180 +247,184 @@ export default defineComponent({
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     margin-top: 91px;
-    margin-bottom: calc(100rpx + env(safe-area-inset-bottom));
-    background: #f5f6fa;
+    margin-bottom: calc(100rpx + $safe-area-inset-bottom);
+    background: $uni-bg-color-grey;
 }
+
 .content {
-    padding: 0 30rpx;
+    padding: 0 $uni-spacing-row-lg;
     padding-bottom: 50rpx;
 }
 
 .header {
-    margin: 30rpx 0;
-    // margin-top: 20rpx;
-    // margin-bottom: 40rpx;
+    margin: $uni-spacing-row-lg 0;
 
     .title {
-        font-size: 36rpx;
-        color: #4080ff;
+        font-size: $uni-font-size-lg;
+        color: $uni-color-primary;
         font-weight: bold;
     }
 }
 
 .result-section {
     padding: 50rpx 0;
-    background: #fff;
-    border-radius: 20rpx;
-    // padding: 40rpx;
+    background: $uni-bg-color;
+    border-radius: $uni-border-radius-lg;
     text-align: center;
-    margin-bottom: 30rpx;
+    margin-bottom: $uni-spacing-row-lg;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 30rpx;
+    gap: $uni-spacing-row-lg;
+
     .result-title {
         font-size: 50rpx;
-        color: #4080ff;
+        color: $uni-color-primary;
         font-weight: bold;
-        margin-bottom: 20rpx;
+        margin-bottom: $uni-spacing-col-lg;
     }
 
     .score-circle {
         width: 200rpx;
         height: 200rpx;
         border-radius: 50%;
-        border: 8rpx solid #4080ff;
+        border: 8rpx solid $uni-color-primary;
         display: flex;
         align-items: center;
         justify-content: center;
 
         .score {
             font-size: 64rpx;
-            color: #4080ff;
+            color: $uni-color-primary;
             font-weight: bold;
         }
 
         .unit {
-            font-size: 24rpx;
-            color: #4080ff;
-            margin-left: 4rpx;
+            font-size: $uni-font-size-sm;
+            color: $uni-color-primary;
+            margin-left: $uni-spacing-col-sm;
         }
     }
 }
 
 .result-content {
-    background: #fff;
-    border-radius: 20rpx;
-    padding: 40rpx;
-    margin-bottom: 30rpx;
+    background: $uni-bg-color;
+    border-radius: $uni-border-radius-lg;
+    padding: $uni-spacing-row-lg;
+    margin-bottom: $uni-spacing-row-lg;
 
     .result-desc {
-        font-size: 28rpx;
-        color: #666;
+        font-size: $uni-font-size-base;
+        color: $uni-text-color-placeholder;
         line-height: 1.6;
-        margin-bottom: 30rpx;
+        margin-bottom: $uni-spacing-row-lg;
     }
 
     .divider {
         height: 1rpx;
-        background: #eee;
-        margin: 30rpx 0;
+        background: $uni-border-color;
+        margin: $uni-spacing-row-lg 0;
     }
 
     .disclaimer {
-        font-size: 24rpx;
-        color: #999;
+        font-size: $uni-font-size-sm;
+        color: $uni-text-color-grey;
         text-align: center;
     }
 }
+
 .section-title {
     display: flex;
     align-items: center;
-    margin-bottom: 30rpx;
+    margin-bottom: $uni-spacing-row-lg;
+
     .title-bar {
         width: 6rpx;
         height: 32rpx;
-        background: #4080ff;
+        background: $uni-color-primary;
         border-radius: 3rpx;
-        margin-right: 16rpx;
+        margin-right: $uni-spacing-row-base;
     }
+
     text {
-        font-size: 32rpx;
-        color: #333;
+        font-size: $uni-font-size-lg;
+        color: $uni-text-color;
         font-weight: 500;
     }
 }
 
 .tips-section {
-    background: #fff;
-    border-radius: 20rpx;
-    padding: 40rpx;
+    background: $uni-bg-color;
+    border-radius: $uni-border-radius-lg;
+    padding: $uni-spacing-row-lg;
+
     .tips-subtitle {
-        font-size: 28rpx;
-        color: #666;
-        margin-bottom: 30rpx;
+        font-size: $uni-font-size-base;
+        color: $uni-text-color-placeholder;
+        margin-bottom: $uni-spacing-row-lg;
         display: block;
     }
 
     .tip-item {
         display: flex;
-        margin-bottom: 30rpx;
+        margin-bottom: $uni-spacing-row-lg;
 
         .tip-number {
-            font-size: 28rpx;
-            color: #333;
+            font-size: $uni-font-size-base;
+            color: $uni-text-color;
             font-weight: 500;
-            margin-right: 16rpx;
+            margin-right: $uni-spacing-row-base;
             flex-shrink: 0;
         }
 
         .tip-text {
-            font-size: 28rpx;
-            color: #666;
+            font-size: $uni-font-size-base;
+            color: $uni-text-color-placeholder;
             line-height: 1.6;
             flex: 1;
         }
     }
 }
+
 .footer-fixed {
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    background: #fff;
+    background: $uni-bg-color;
     z-index: 100;
 }
+
 .footer {
-    padding: 20rpx 30rpx;
-    padding-bottom: env(safe-area-inset-bottom);
+    padding: $uni-spacing-col-lg $uni-spacing-row-lg;
+    padding-bottom: $safe-area-inset-bottom;
     display: flex;
-    background: #fff;
+    background: $uni-bg-color;
     box-sizing: border-box;
 
     .back-btn {
         flex: 1;
-        font-size: 30rpx;
+        font-size: $uni-font-size-base;
         text-align: center;
         margin: 0;
         padding: 0;
-        border-radius: 10rpx 0 0 10rpx;
+        border-radius: $uni-border-radius-base 0 0 $uni-border-radius-base;
         height: 80rpx;
-        background: #f5f6fa;
-        color: #666;
+        background: $uni-bg-color-grey;
+        color: $uni-text-color-placeholder;
     }
 
     .share-btn {
         flex: 1;
-        font-size: 30rpx;
+        font-size: $uni-font-size-base;
         text-align: center;
         margin: 0;
         padding: 0;
         height: 80rpx;
-
-        background: #4080ff;
-        color: #fff;
-        border-radius: 0 10rpx 10rpx 0;
+        background: $uni-color-primary;
+        color: $uni-text-color-inverse;
+        border-radius: 0 $uni-border-radius-base $uni-border-radius-base 0;
     }
 }
 
@@ -432,8 +435,8 @@ export default defineComponent({
     justify-content: center;
 
     text {
-        font-size: 32rpx;
-        color: #666;
+        font-size: $uni-font-size-lg;
+        color: $uni-text-color-placeholder;
     }
 }
 </style>

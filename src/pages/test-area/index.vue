@@ -97,6 +97,7 @@ export default defineComponent({
     height: 100%;
     display: flex;
     flex-direction: column;
+    background: $uni-bg-color-grey;
 }
 
 .content-scroll {
@@ -107,17 +108,7 @@ export default defineComponent({
         padding: 30rpx;
 
         // 默认 padding-bottom
-        padding-bottom: 30rpx;
-
-        // iOS 11.2 之前使用 constant()
-        @supports (padding-bottom: constant(safe-area-inset-bottom)) {
-            padding-bottom: calc(20rpx + constant(safe-area-inset-bottom));
-        }
-
-        // iOS 11.2 及以后使用 env()
-        @supports (padding-bottom: env(safe-area-inset-bottom)) {
-            padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-        }
+        padding-bottom: 20rpx + $safe-area-inset-bottom;
     }
 }
 .big-box {
@@ -127,19 +118,19 @@ export default defineComponent({
     // box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 .test-header {
-    margin-bottom: 20rpx;
+    margin-bottom: $uni-spacing-col-lg;
     .title {
-        font-size: 36rpx;
+        font-size: $uni-font-size-title;
         font-weight: bold;
-        color: #333;
+        color: $uni-text-color;
     }
 
     .subtitle {
         display: flex;
         align-items: center;
-        margin-top: 10rpx;
-        font-size: 24rpx;
-        color: #666;
+        margin-top: $uni-spacing-col-base;
+        font-size: $uni-font-size-sm;
+        color: $uni-text-color-grey;
 
         .check-icon {
             width: 48rpx;
@@ -149,10 +140,10 @@ export default defineComponent({
     }
 }
 .test-card {
-    background: #fff;
-    border-radius: 16rpx;
-    padding: 30rpx;
-    margin-bottom: 20rpx;
+    background: $uni-bg-color;
+    border-radius: $uni-border-radius-lg;
+    padding: $uni-spacing-row-lg;
+    margin-bottom: $uni-spacing-col-lg;
     position: relative;
     display: flex;
     flex-direction: row;
@@ -171,15 +162,15 @@ export default defineComponent({
         }
 
         .card-title {
-            font-size: 32rpx;
+            font-size: $uni-font-size-lg;
             font-weight: 500;
-            color: #333;
+            color: $uni-text-color;
             margin-bottom: 10rpx;
         }
 
         .card-desc {
-            font-size: 26rpx;
-            color: #999;
+            font-size: $uni-font-size-base;
+            color: $uni-text-color-grey;
             margin-bottom: 20rpx;
             display: -webkit-box;
             -webkit-box-orient: vertical;
@@ -191,12 +182,12 @@ export default defineComponent({
         }
 
         .card-meta {
-            font-size: 24rpx;
-            color: #666;
+            font-size: $uni-font-size-sm;
+            color: $uni-text-color-placeholder;
 
             .divider {
-                margin: 0 10rpx;
-                color: #ddd;
+                margin: 0 $uni-spacing-row-base;
+                color: $uni-border-color;
             }
         }
 

@@ -74,34 +74,30 @@ export default defineComponent({
     height: 100%;
     display: flex;
     flex-direction: column;
-    background: #f5f6fa;
+    background: $uni-bg-color-grey;
 }
 
 .category-tabs {
-    background: #fff;
+    background: $uni-bg-color;
     white-space: nowrap;
-    padding: 0 20rpx;
+    padding: 0 $uni-spacing-row-lg;
 
     .tab-list {
         display: inline-flex;
-        padding: 20rpx 0;
+        padding: $uni-spacing-col-lg 0;
     }
 
     .tab-item {
-        padding: 10rpx 30rpx;
-        margin: 0 10rpx;
-        font-size: 28rpx;
-        color: #666;
-        background: #f5f6fa;
-        border-radius: 32rpx;
+        padding: $uni-spacing-col-sm $uni-spacing-row-lg;
+        margin: 0 $uni-spacing-row-base;
+        font-size: $uni-font-size-base;
+        color: $uni-text-color-placeholder;
+        background: $uni-bg-color-grey;
+        border-radius: $uni-border-radius-lg;
 
         &.active {
-            color: #fff;
-            background: #4080ff;
-        }
-
-        &:first-child {
-            margin-left: 0;
+            color: $uni-text-color-inverse;
+            background: $uni-color-primary;
         }
     }
 }
@@ -113,18 +109,13 @@ export default defineComponent({
 }
 
 .test-list {
-    padding: 20rpx;
-    padding-bottom: calc(0rpx + constant(safe-area-inset-bottom)); /* iOS 11.2 之前 */
-    padding-bottom: calc(0rpx + env(safe-area-inset-bottom)); /* iOS 11.2 及以后 */
+    padding: $uni-spacing-row-lg;
 
     .test-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 30rpx;
-        margin-bottom: 20rpx;
-        background: #fff;
-        border-radius: 12rpx;
+        padding: $uni-spacing-row-lg;
+        margin-bottom: $uni-spacing-col-lg;
+        background: $uni-bg-color;
+        border-radius: $uni-border-radius-lg;
 
         .test-info {
             flex: 1;
@@ -132,36 +123,37 @@ export default defineComponent({
         }
 
         .test-name {
-            font-size: 32rpx;
+            font-size: $uni-font-size-lg;
             font-weight: 500;
-            color: #333;
-            margin-bottom: 10rpx;
+            color: $uni-text-color;
+            margin-bottom: $uni-spacing-col-base;
         }
 
         .test-meta {
-            font-size: 24rpx;
-            color: #999;
+            font-size: $uni-font-size-sm;
+            color: $uni-text-color-grey;
 
             .tested-tag {
-                color: #666;
-                margin-right: 20rpx;
+                color: $uni-text-color-placeholder;
+                margin-right: $uni-spacing-row-lg;
             }
 
             .divider {
-                margin: 0 10rpx;
-                color: #ddd;
+                margin: 0 $uni-spacing-row-base;
+                color: $uni-border-color;
             }
         }
 
         .start-btn {
+            margin-top: 30rpx;
             min-width: 160rpx;
             height: 64rpx;
             line-height: 64rpx;
-            font-size: 28rpx;
-            color: #fff;
-            background: #4080ff;
-            border-radius: 32rpx;
-            padding: 0 30rpx;
+            font-size: $uni-font-size-base;
+            color: $uni-text-color-inverse;
+            background: $uni-color-primary;
+            border-radius: $uni-border-radius-lg;
+            padding: 0 $uni-spacing-row-lg;
         }
     }
 }

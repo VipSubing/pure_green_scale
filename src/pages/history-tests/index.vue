@@ -64,7 +64,7 @@ export default defineComponent({
     height: 100%;
     display: flex;
     flex-direction: column;
-    background: #f5f6fa;
+    background: $uni-bg-color-grey;
 }
 
 .history-list-scroll {
@@ -73,51 +73,37 @@ export default defineComponent({
 }
 
 .history-list {
-    padding: 20rpx;
-    padding-bottom: calc(0rpx + constant(safe-area-inset-bottom)); /* iOS 11.2 之前 */
-    padding-bottom: calc(00rpx + env(safe-area-inset-bottom)); /* iOS 11.2 及以后 */
+    padding: $uni-spacing-row-lg;
 
     .history-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 30rpx;
-        margin-bottom: 20rpx;
-        background: #fff;
-        border-radius: 12rpx;
+        padding: $uni-spacing-row-lg;
+        margin-bottom: $uni-spacing-col-lg;
+        background: $uni-bg-color;
+        border-radius: $uni-border-radius-lg;
 
         .test-info {
-            display: flex;
-            flex-direction: column;
-            gap: 10rpx;
-
             .test-name {
-                font-size: 32rpx;
+                font-size: $uni-font-size-lg;
                 font-weight: 500;
-                color: #333;
+                color: $uni-text-color;
             }
 
             .test-time {
-                font-size: 24rpx;
-                color: #999;
+                font-size: $uni-font-size-sm;
+                color: $uni-text-color-grey;
             }
         }
 
         .view-result {
-            margin: 0;
             min-width: 160rpx;
             height: 64rpx;
             line-height: 64rpx;
-            font-size: 28rpx;
-            color: #fff;
-            background: #4080ff;
-            border-radius: 32rpx;
-            padding: 0 30rpx;
+            font-size: $uni-font-size-base;
+            color: $uni-text-color-inverse;
+            background: $uni-color-primary;
+            border-radius: $uni-border-radius-lg;
+            padding: 0 $uni-spacing-row-lg;
             border: none;
-
-            &::after {
-                border: none;
-            }
         }
     }
 }

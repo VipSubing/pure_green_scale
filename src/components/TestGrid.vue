@@ -64,9 +64,9 @@ export default defineComponent({
     gap: 20rpx;
 
     .test-card {
-        background: #fff;
-        border-radius: 16rpx;
-        padding: 30rpx;
+        background: $uni-bg-color;
+        border-radius: $uni-border-radius-lg;
+        padding: $uni-spacing-row-lg;
         position: relative;
         border: 2rpx solid rgba(0, 0, 0, 0.05);
 
@@ -75,26 +75,26 @@ export default defineComponent({
         }
 
         .card-title {
-            font-size: 32rpx;
+            font-size: $uni-font-size-lg;
             font-weight: 500;
-            color: #333;
+            color: $uni-text-color;
             margin-bottom: 20rpx;
         }
 
         .card-meta {
-            font-size: 24rpx;
-            color: #666;
+            font-size: $uni-font-size-sm;
+            color: $uni-text-color-placeholder;
 
             .divider {
                 margin: 0 10rpx;
-                color: #ddd;
+                color: $uni-border-color;
             }
         }
 
         .user-count {
-            font-size: 24rpx;
-            color: #999;
-            margin-top: 20rpx;
+            font-size: $uni-font-size-sm;
+            color: $uni-text-color-grey;
+            margin-top: $uni-spacing-col-lg;
         }
 
         .image-container {
@@ -119,11 +119,11 @@ export default defineComponent({
             position: absolute;
             top: 20rpx;
             right: 20rpx;
-            background: #ff5252;
-            color: #fff;
+            background: $uni-color-error;
+            color: $uni-text-color-inverse;
             font-size: 20rpx;
             padding: 4rpx 12rpx;
-            border-radius: 20rpx;
+            border-radius: $uni-border-radius-lg;
         }
     }
 }

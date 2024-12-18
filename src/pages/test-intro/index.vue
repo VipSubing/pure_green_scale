@@ -183,7 +183,7 @@ export default defineComponent({
 <style lang="scss">
 .test-intro {
     min-height: 100vh;
-    background: #fff;
+    background: $uni-bg-color;
     display: flex;
     flex-direction: column;
 }
@@ -209,9 +209,9 @@ export default defineComponent({
     }
 
     .test-name {
-        font-size: 48rpx;
+        font-size: $uni-font-size-title;
         font-weight: bold;
-        color: #333;
+        color: $uni-text-color;
     }
 }
 
@@ -227,16 +227,16 @@ export default defineComponent({
     }
 
     text {
-        font-size: 28rpx;
-        color: #666;
+        font-size: $uni-font-size-base;
+        color: $uni-text-color-placeholder;
     }
 }
 
 .intro-section {
     .intro-title {
         text-align: center;
-        font-size: 32rpx;
-        color: #4080ff;
+        font-size: $uni-font-size-lg;
+        color: $uni-color-primary;
         margin: 40rpx 0;
     }
 }
@@ -250,21 +250,21 @@ export default defineComponent({
         text-align: center;
 
         .number {
-            font-size: 48rpx;
+            font-size: $uni-font-size-title;
             font-weight: bold;
-            color: #333;
+            color: $uni-text-color;
         }
 
         .label {
-            font-size: 24rpx;
-            color: #666;
+            font-size: $uni-font-size-sm;
+            color: $uni-text-color-placeholder;
             margin-left: 4rpx;
         }
 
         .desc {
             display: block;
-            font-size: 24rpx;
-            color: #999;
+            font-size: $uni-font-size-sm;
+            color: $uni-text-color-grey;
             margin-top: 8rpx;
         }
     }
@@ -286,16 +286,16 @@ export default defineComponent({
 
         text {
             flex: 1;
-            font-size: 28rpx;
-            color: #666;
+            font-size: $uni-font-size-base;
+            color: $uni-text-color-placeholder;
             line-height: 1.8;
         }
     }
 }
 
 .privacy-notice {
-    font-size: 24rpx;
-    color: #999;
+    font-size: $uni-font-size-sm;
+    color: $uni-text-color-grey;
     line-height: 1.6;
     margin-top: 60rpx;
     text-align: center;
@@ -307,10 +307,9 @@ export default defineComponent({
     align-items: center;
     gap: 20rpx;
     padding: 20rpx 30rpx;
-    padding-bottom: calc(constant(safe-area-inset-bottom)); /* iOS 11.2 之前 */
-    padding-bottom: calc(env(safe-area-inset-bottom)); /* iOS 11.2 及以后 */
+    padding-bottom: $safe-area-inset-bottom; /* iOS 11.2 及以后 */
     background: #fff;
-    border-top: 1rpx solid #eee;
+    border-top: 1rpx solid $uni-border-color;
 
     .share-btn {
         display: flex;
@@ -318,10 +317,10 @@ export default defineComponent({
         justify-content: center;
         width: 180rpx;
         height: 88rpx;
-        background: #f5f6fa;
-        border-radius: 44rpx;
-        font-size: 28rpx;
-        color: #666;
+        background: $uni-bg-color-grey;
+        border-radius: $uni-border-radius-lg;
+        font-size: $uni-font-size-base;
+        color: $uni-text-color-placeholder;
         border: none;
         .share-icon {
             width: 36rpx;
@@ -335,11 +334,10 @@ export default defineComponent({
         flex: 1;
         height: 88rpx;
         line-height: 88rpx;
-        background: #4080ff;
-        color: #fff;
-        font-size: 32rpx;
-        border-radius: 44rpx;
-        border: 1rpx solid #4080ff;
+        background: $uni-color-primary;
+        color: $uni-text-color-inverse;
+        font-size: $uni-font-size-lg;
+        border-radius: $uni-border-radius-lg;
         text-align: center;
 
         .tag {
