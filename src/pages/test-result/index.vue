@@ -402,6 +402,7 @@ export default defineComponent({
     display: flex;
     background: $uni-bg-color;
     box-sizing: border-box;
+    gap: 20rpx;
 
     .back-btn {
         flex: 1;
@@ -409,8 +410,11 @@ export default defineComponent({
         text-align: center;
         margin: 0;
         padding: 0;
-        border-radius: $uni-border-radius-base 0 0 $uni-border-radius-base;
+        border-radius: $uni-border-radius-lg 0 0 $uni-border-radius-lg;
+        border: none; /* 清除默认边框 */
+        box-shadow: none; /* 清除阴影 */
         height: 80rpx;
+        line-height: 80rpx;
         background: $uni-bg-color-grey;
         color: $uni-text-color-placeholder;
     }
@@ -422,9 +426,10 @@ export default defineComponent({
         margin: 0;
         padding: 0;
         height: 80rpx;
+        line-height: 80rpx;
         background: $uni-color-primary;
         color: $uni-text-color-inverse;
-        border-radius: 0 $uni-border-radius-base $uni-border-radius-base 0;
+        border-radius: 0 $uni-border-radius-lg $uni-border-radius-lg 0;
     }
 }
 

@@ -12,6 +12,7 @@
                 <view v-for="result in historyList" :key="result.id" class="history-item">
                     <view class="test-info">
                         <text class="test-name">{{ result.test.name }}</text>
+                        <text class="test-score"> {{ result.scoreText }}</text>
                         <text class="test-time">
                             测试完成时间 {{ formatDate(result.completedDate) }}
                         </text>
@@ -82,12 +83,18 @@ export default defineComponent({
         border-radius: $uni-border-radius-lg;
 
         .test-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10rpx;
             .test-name {
                 font-size: $uni-font-size-lg;
                 font-weight: 500;
                 color: $uni-text-color;
             }
-
+            .test-score {
+                font-size: $uni-font-size-base;
+                color: $uni-text-color-grey;
+            }
             .test-time {
                 font-size: $uni-font-size-sm;
                 color: $uni-text-color-grey;
@@ -95,6 +102,7 @@ export default defineComponent({
         }
 
         .view-result {
+            margin-top: 30rpx;
             min-width: 160rpx;
             height: 64rpx;
             line-height: 64rpx;
