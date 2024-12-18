@@ -114,7 +114,7 @@ export default defineComponent({
             border-radius: 32rpx;
             padding: 0 30rpx;
             border: none;
-            
+
             &::after {
                 border: none;
             }

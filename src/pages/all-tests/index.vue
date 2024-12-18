@@ -110,22 +110,12 @@ export default defineComponent({
 .test-list-scroll {
     flex: 1;
     height: 0; /* 关键：让scroll-view正确计算高度 */
-
-    &::-webkit-scrollbar {
-        display: none;
-        width: 0 !important;
-        height: 0 !important;
-        -webkit-appearance: none;
-        background: transparent;
-    }
-    scrollbar-width: none;
-    -ms-overflow-style: none;
 }
 
 .test-list {
     padding: 20rpx;
     padding-bottom: calc(0rpx + constant(safe-area-inset-bottom)); /* iOS 11.2 之前 */
-    padding-bottom: calc(00rpx + env(safe-area-inset-bottom)); /* iOS 11.2 及以后 */
+    padding-bottom: calc(0rpx + env(safe-area-inset-bottom)); /* iOS 11.2 及以后 */
 
     .test-item {
         display: flex;

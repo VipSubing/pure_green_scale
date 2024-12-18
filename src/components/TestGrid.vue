@@ -66,6 +66,7 @@ export default defineComponent({
         border-radius: 16rpx;
         padding: 30rpx;
         position: relative;
+        border: 2rpx solid rgba(0, 0, 0, 0.05);
 
         .card-content {
             flex: 1;
