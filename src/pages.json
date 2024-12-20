@@ -1,97 +1,96 @@
 {
-    "pages": [
-        {
-            "path": "pages/index/index",
-            "style": {
-                // "navigationBarTitleText": "纯绿心理测验",
-                "navigationBarBackgroundColor": "#FFFFFF",
-                "navigationBarTextStyle": "black"
-            }
-        },
-        {
-            "path": "pages/test/index",
-            "style": {
-                "navigationBarTitleText": "",
-                "navigationBarBackgroundColor": "#FFFFFF",
-                "navigationBarTextStyle": "black",
-                "app-plus": {
-                    "bounce": "none",
-                    "titleNView": {
-                        "backButtonOffset": "10rpx"
-                    }
-                }
-            }
-        },
-        {
-            "path": "pages/test-intro/index",
-            "style": {
-                "navigationBarTitleText": "测评介绍",
-                "navigationBarBackgroundColor": "#FFFFFF",
-                "navigationBarTextStyle": "black",
-                "app-plus": {
-                    "bounce": "none",
-                    "titleNView": {
-                        "buttons": [
-                            {
-                                "text": "\ue60e",
-                                "fontSrc": "/static/fonts/iconfont.ttf",
-                                "fontSize": "22px",
-                                "color": "#333333"
-                            }
-                        ]
-                    }
-                }
-            }
-        },
-        {
-            "path": "pages/test-area/index",
-            "style": {
-                "navigationBarTitleText": "心理测评",
-                "navigationBarBackgroundColor": "#FFFFFF",
-                "navigationBarTextStyle": "black"
-            }
-        },
-        {
-            "path": "pages/all-tests/index",
-            "style": {
-                "navigationBarTitleText": "全部测评",
-                "navigationBarBackgroundColor": "#FFFFFF",
-                "navigationBarTextStyle": "black"
-            }
-        },
-        {
-            "path": "pages/history-tests/index",
-            "style": {
-                "navigationBarTitleText": "历史测评",
-                "navigationBarBackgroundColor": "#FFFFFF",
-                "navigationBarTextStyle": "black"
-            }
-        },
-        {
-            "path": "pages/test-result/index",
-            "style": {
-                "navigationBarBackgroundColor": "#FFFFFF",
-                "navigationBarTextStyle": "black",
-                "navigationStyle": "custom"
-            }
-        }
-    ],
-    "globalStyle": {
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "纯绿心理测验",
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
         "navigationBarBackgroundColor": "#FFFFFF",
-        "backgroundColor": "#F5F6FA",
-        "app-plus": {
-            "titleNView": {
-                "backButtonOffset": "10rpx"
-            }
-        }
+        "navigationBarTextStyle": "black"
+      }
     },
-
-    "easycom": {
-        "autoscan": true,
-        "custom": {
-            "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+    {
+      "path": "pages/test/index",
+      "style": {
+        "navigationBarTitleText": "",
+        "navigationBarBackgroundColor": "#FFFFFF",
+        "navigationBarTextStyle": "black",
+        "app-plus": {
+          "bounce": "none",
+          "titleNView": {
+            "backButtonOffset": "10rpx"
+          }
         }
+      }
+    },
+    {
+      "path": "pages/test-intro/index",
+      "style": {
+        "navigationBarTitleText": "测评介绍",
+        "navigationBarBackgroundColor": "#FFFFFF",
+        "navigationBarTextStyle": "black",
+        "app-plus": {
+          "bounce": "none",
+          "titleNView": {
+            "buttons": [
+              {
+                "text": "\ue60e",
+                "fontSrc": "/static/fonts/iconfont.ttf",
+                "fontSize": "22px",
+                "color": "#333333"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "path": "pages/test-area/index",
+      "style": {
+        "navigationBarTitleText": "心理测评",
+        "navigationBarBackgroundColor": "#FFFFFF",
+        "navigationBarTextStyle": "black"
+      }
+    },
+    {
+      "path": "pages/all-tests/index",
+      "style": {
+        "navigationBarTitleText": "全部测评",
+        "navigationBarBackgroundColor": "#FFFFFF",
+        "navigationBarTextStyle": "black"
+      }
+    },
+    {
+      "path": "pages/history-tests/index",
+      "style": {
+        "navigationBarTitleText": "历史测评",
+        "navigationBarBackgroundColor": "#FFFFFF",
+        "navigationBarTextStyle": "black"
+      }
+    },
+    {
+      "path": "pages/test-result/index",
+      "style": {
+        "navigationBarBackgroundColor": "#FFFFFF",
+        "navigationBarTextStyle": "black",
+        "navigationStyle": "custom"
+      }
     }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "纯绿心理测验",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F5F6FA",
+    "app-plus": {
+      "titleNView": {
+        "backButtonOffset": "10rpx"
+      }
+    }
+  },
+
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+    }
+  }
 }
