@@ -144,7 +144,9 @@ export default defineComponent({
         });
         // 记录选择
         answers.value[currentIndex.value] = answerIndex;
-        nextQuestion();
+        setTimeout(() => {
+          nextQuestion();
+        }, 300);
       } else {
         // 多选模式：切换选中状态
         currentQuestion.value.answers[answerIndex].selected =
