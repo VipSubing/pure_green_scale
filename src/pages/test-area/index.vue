@@ -116,7 +116,7 @@ export default defineComponent({
     padding: 30rpx;
 
     // 默认 padding-bottom
-    padding-bottom: 20rpx + $safe-area-inset-bottom;
+    // padding-bottom: 20rpx + $safe-area-inset-bottom;
   }
 }
 .big-box {
@@ -124,7 +124,7 @@ export default defineComponent({
   padding-bottom: 40rpx;
   border-radius: 20rpx;
   background: linear-gradient(180deg, #7fde87 0%, #ffffff 100%);
-  // box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  // background: blue;
 }
 .test-header {
   margin-bottom: $uni-spacing-col-lg;
@@ -139,11 +139,12 @@ export default defineComponent({
     align-items: center;
     margin-top: $uni-spacing-col-base;
     font-size: $uni-font-size-sm;
-    color: $uni-text-color-grey;
+    color: white;
 
     .check-icon {
       width: 48rpx;
       height: 48rpx;
+      border-radius: 10rpx;
       margin-right: 10rpx;
     }
   }
@@ -151,7 +152,7 @@ export default defineComponent({
 .test-card {
   background: $uni-bg-color;
   border-radius: $uni-border-radius-lg;
-  padding: $uni-spacing-row-lg;
+  padding: $uni-spacing-row-base;
   margin-bottom: $uni-spacing-col-lg;
   position: relative;
   display: flex;
@@ -216,7 +217,8 @@ export default defineComponent({
       position: absolute;
       height: 200rpx;
       width: 280rpx;
-      margin-right: 20rpx;
+      bottom: -20rpx;
+      right: -60rpx;
     }
   }
 }

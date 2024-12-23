@@ -1,17 +1,5 @@
 <template>
   <view class="container">
-    <!-- 固定导航栏 -->
-    <view class="nav-fixed">
-      <uni-nav-bar
-        :fixed="true"
-        status-bar
-        :leftIcon="page_type === 'test' ? '' : 'left'"
-        :border="false"
-        :title="page_title"
-        @clickLeft="goBack"
-      />
-    </view>
-
     <!-- 可滚动内容区域 -->
     <scroll-view
       scroll-y
@@ -20,9 +8,6 @@
       :enable-flex="true"
       :enhanced="true"
       :show-scrollbar="false"
-      :style="{
-        height: 'calc(100vh - 44px - var(--status-bar-height) - 128rpx)',
-      }"
     >
       <!-- 加载状态 -->
       <view v-if="isLoading" class="loading-state">
@@ -97,7 +82,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
+import { onLoad, onShow } from "@dcloudio/uni-app";
 import { useStore } from "@/store";
 import type { ResultItem, ComputeResult, ResultResponse } from "@/types/test";
 import manifest from "@/manifest.json";
@@ -110,8 +95,6 @@ export default defineComponent({
     const store = useStore();
     const resultInfo = ref<ResultItem>();
     const isLoading = ref(false);
-    const page_type = ref("");
-    const page_title = ref("");
 
     // 从服务器获取测试结果
     const fetchTestResult = async (
@@ -148,16 +131,15 @@ export default defineComponent({
     onLoad(async (options: any) => {
       const { type, id, testJson } = options;
       console.log("type", type, "id", id);
-      page_type.value = type;
       if (type === "test") {
-        isLoading.value = true;
         try {
           if (testJson) {
             // 解码并解析测试数据
             const decodedJson = decodeURIComponent(testJson);
             const test = JSON.parse(decodedJson);
-            page_title.value = test.name || "测试结果";
-
+            uni.setNavigationBarTitle({
+              title: test.name || "测试结果",
+            });
             // 获取测试结果
             const result = await fetchTestResult(id, test.items);
             console.log("result", result);
@@ -200,7 +182,9 @@ export default defineComponent({
         const result = store.state.test.historyResults.find(
           (item: ResultItem) => item.id === id
         );
-        page_title.value = result?.test.name || "测试结果";
+        uni.setNavigationBarTitle({
+          title: result?.test.name || "测试结果",
+        });
 
         resultInfo.value = result;
       }
@@ -222,10 +206,8 @@ export default defineComponent({
       manifest,
       resultInfo,
       isLoading,
-      page_title,
       shareResult,
       goBack,
-      page_type,
     };
   },
 });
@@ -234,19 +216,10 @@ export default defineComponent({
 <style lang="scss">
 .container {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   position: relative;
-}
-
-.nav-fixed {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  background: $uni-bg-color;
 }
 
 .content-scroll {
@@ -254,7 +227,6 @@ export default defineComponent({
   box-sizing: border-box;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  margin-top: 91px;
   margin-bottom: calc(100rpx + $safe-area-inset-bottom);
   background: $uni-bg-color-grey;
 }

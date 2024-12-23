@@ -70,8 +70,7 @@
       "path": "pages/test-result/index",
       "style": {
         "navigationBarBackgroundColor": "#FFFFFF",
-        "navigationBarTextStyle": "black",
-        "navigationStyle": "custom"
+        "navigationBarTextStyle": "black"
       }
     }
   ],

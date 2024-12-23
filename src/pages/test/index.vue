@@ -178,7 +178,7 @@ export default defineComponent({
 
       try {
         // 跳转到结果页面，传递答题数据
-        uni.navigateTo({
+        uni.redirectTo({
           url: `/pages/test-result/index?type=test&id=${
             testPaper.value.id
           }&testJson=${encodeURIComponent(JSON.stringify(testPaper.value))}`,

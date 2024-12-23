@@ -5,11 +5,22 @@
       <nav-tabs :tabs="tabs" v-model:currentTab="currentTab" />
     </view>
     <!-- 可滚动的内容区域 -->
-    <view class="content">
-      <test-area v-if="currentTab === 0" />
-      <all-tests v-if="currentTab === 1" />
-      <history-tests v-if="currentTab === 2" />
-    </view>
+    <swiper
+      class="swiper-content"
+      :current="currentTab"
+      @change="onSwiperChange"
+      :duration="300"
+    >
+      <swiper-item>
+        <test-area />
+      </swiper-item>
+      <swiper-item>
+        <all-tests />
+      </swiper-item>
+      <swiper-item>
+        <history-tests />
+      </swiper-item>
+    </swiper>
   </view>
 </template>
 
@@ -20,6 +31,7 @@ import TestArea from "@/pages/test-area/index.vue";
 import AllTests from "@/pages/all-tests/index.vue";
 import HistoryTests from "@/pages/history-tests/index.vue";
 import manifest from "@/manifest.json";
+
 export default defineComponent({
   name: "Index",
   components: {
@@ -31,20 +43,21 @@ export default defineComponent({
   setup() {
     const tabs = ["热门推荐", "全部测评", "历史测评"];
     const currentTab = ref(0);
-    // const scrollTop = ref(0)
 
-    // const onScroll = (e: any) => {
-    //     scrollTop.value = e.detail.scrollTop
-    // }
-    // ! 设置导航栏标题
+    // 处理滑动切换
+    const onSwiperChange = (e: any) => {
+      currentTab.value = e.detail.current;
+    };
+
+    // 设置导航栏标题
     uni.setNavigationBarTitle({
       title: manifest.name,
     });
+
     return {
       tabs,
       currentTab,
-      // scrollTop,
-      // onScroll,
+      onSwiperChange,
     };
   },
 });
@@ -66,15 +79,13 @@ export default defineComponent({
   z-index: 100;
   background: #fff;
   height: 100rpx;
-  /* 导航栏下方添加阴影 */
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
 }
 
-.content {
+.swiper-content {
   flex: 1;
-  /* ! 设置内容区域的上边距，值为导航栏的高度 */
-  margin-top: 100rpx; /* 根据实际导航栏高度调整 */
-  height: calc(100vh - 100rpx); /* 减去导航栏高度 */
+  margin-top: 100rpx;
+  height: calc(100vh - 100rpx);
   overflow: hidden;
 }
 </style>
