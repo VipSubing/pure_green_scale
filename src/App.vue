@@ -1,16 +1,11 @@
 <script setup lang="ts">
 import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
-import { useStore } from "./store";
-
-const store = useStore();
 
 onLaunch(() => {
   console.log("App Launch");
 });
 onShow(() => {
   console.log("App Show");
-  // 清除分享状态
-  store.dispatch("share/clearShareStatus");
 });
 onHide(() => {
   console.log("App Hide");

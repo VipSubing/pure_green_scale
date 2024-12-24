@@ -26,6 +26,8 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { onShow } from "@dcloudio/uni-app";
+import { useStore } from "@/store";
 import NavTabs from "@/components/NavTabs.vue";
 import TestArea from "@/pages/test-area/index.vue";
 import AllTests from "@/pages/all-tests/index.vue";
@@ -39,6 +41,12 @@ export default defineComponent({
     TestArea,
     AllTests,
     HistoryTests,
+  },
+  onShow() {
+    
+    console.log("onShow");
+    const store = useStore();
+    store.dispatch("share/clearShareStatus");
   },
   setup() {
     const tabs = ["热门推荐", "全部测评", "历史测评"];
@@ -88,4 +96,6 @@ export default defineComponent({
   height: calc(100vh - 100rpx);
   overflow: hidden;
 }
+</style>
+
 </style>
