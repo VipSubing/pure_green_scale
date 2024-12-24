@@ -175,14 +175,12 @@ onLoad(async (options: any) => {
       isLoading.value = false;
     }
   } else if (type === "history") {
-    const result = store.state.test.historyResults.find(
+    resultInfo.value = store.state.test.historyResults.find(
       (item: ResultItem) => item.id === id
     );
     uni.setNavigationBarTitle({
-      title: result?.test.name || "测试结果",
+      title: resultInfo.value?.test.name || "测试结果",
     });
-
-    resultInfo.value = result;
   }
 });
 
@@ -194,9 +192,8 @@ function goBack() {
 
 onShareAppMessage(() => {
   return {
-    title: `${manifest.name} · 测评结果`,
-    path: "/pages/index/index",
-    imageUrl: "/static/images/share-cover.png",
+    title: resultInfo.value?.test.name || "心理测评",
+    path: `/pages/test-intro/index?id=${resultInfo.value?.test.id}`,
   };
 });
 </script>
