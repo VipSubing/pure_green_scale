@@ -74,11 +74,6 @@
         {{ isLoading ? "资源加载中..." : loadFailed ? "加载失败" : "开始测评" }}
       </button>
     </view>
-
-    <canvas
-      canvas-id="shareCanvas"
-      style="position: fixed; left: -9999px"
-    ></canvas>
   </view>
 </template>
 

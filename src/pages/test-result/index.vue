@@ -74,142 +74,130 @@
     <view class="footer-fixed">
       <view class="footer">
         <button class="back-btn" @tap="goBack">返回首页</button>
-        <button class="share-btn" @tap="shareResult">邀请朋友测一测</button>
+        <button open-type="share" class="share-btn">邀请朋友测一测</button>
       </view>
     </view>
   </view>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
-import { onLoad, onShow } from "@dcloudio/uni-app";
+<script setup lang="ts">
+import { ref } from "vue";
+import { onLoad, onShareAppMessage } from "@dcloudio/uni-app";
 import { useStore } from "@/store";
 import type { ResultItem, ComputeResult, ResultResponse } from "@/types/test";
 import manifest from "@/manifest.json";
 
 const RESULT_API = "https://subing.site/scale/api/compute";
 
-export default defineComponent({
-  name: "TestResult",
-  setup() {
-    const store = useStore();
-    const resultInfo = ref<ResultItem>();
-    const isLoading = ref(false);
+const store = useStore();
+const resultInfo = ref<ResultItem>();
+const isLoading = ref(false);
 
-    // 从服务器获取测试结果
-    const fetchTestResult = async (
-      testId: string,
-      items: any[]
-    ): Promise<ComputeResult> => {
-      const response = await uni.request({
-        url: RESULT_API,
-        method: "POST",
-        data: {
-          items,
-          id: testId,
-        },
-        header: {
-          "content-type": "application/json",
-        },
-      });
-      console.log("response", response);
-      if (response.statusCode === 200 && response.data) {
-        const resultResponse = response.data as ResultResponse;
-        if (resultResponse.code === 200) {
-          // 如果返回的是字符串，需要解析
-          const resultData =
-            typeof resultResponse.data === "string"
-              ? JSON.parse(resultResponse.data)
-              : resultResponse.data;
+// 从服务器获取测试结果
+async function fetchTestResult(
+  testId: string,
+  items: any[]
+): Promise<ComputeResult> {
+  const response = await uni.request({
+    url: RESULT_API,
+    method: "POST",
+    data: {
+      items,
+      id: testId,
+    },
+    header: {
+      "content-type": "application/json",
+    },
+  });
+  console.log("response", response);
+  if (response.statusCode === 200 && response.data) {
+    const resultResponse = response.data as ResultResponse;
+    if (resultResponse.code === 200) {
+      // 如果返回的是字符串，需要解析
+      const resultData =
+        typeof resultResponse.data === "string"
+          ? JSON.parse(resultResponse.data)
+          : resultResponse.data;
 
-          return resultData as ComputeResult;
-        }
-      }
-      throw new Error("Failed to fetch test result");
-    };
-
-    onLoad(async (options: any) => {
-      const { type, id, testJson } = options;
-      console.log("type", type, "id", id);
-      if (type === "test") {
-        try {
-          if (testJson) {
-            // 解码并解析测试数据
-            const decodedJson = decodeURIComponent(testJson);
-            const test = JSON.parse(decodedJson);
-            uni.setNavigationBarTitle({
-              title: test.name || "测试结果",
-            });
-            // 获取测试结果
-            const result = await fetchTestResult(id, test.items);
-            console.log("result", result);
-
-            // 生成结果对象
-            const resultItem: ResultItem = {
-              id: Date.now().toString(),
-              test: {
-                id: test.id,
-                name: test.name,
-                description: test.description,
-                userCount: test.userCount,
-                questionCount: test.questionCount,
-                duration: test.duration,
-                type: test.type,
-                source: test.source,
-                soloChoice: test.soloChoice,
-              },
-              introTexts: result.summary,
-              completedDate: Date.now(),
-              score: result.score,
-              scoreText: result.level,
-              suggest: test.suggest,
-            };
-
-            // 保存到 store
-            store.dispatch("test/addTestResult", resultItem);
-            resultInfo.value = resultItem;
-          }
-        } catch (e) {
-          console.error("获取测试结果失败:", e);
-          uni.showToast({
-            title: "获取结果失败",
-            icon: "none",
-          });
-        } finally {
-          isLoading.value = false;
-        }
-      } else if (type === "history") {
-        const result = store.state.test.historyResults.find(
-          (item: ResultItem) => item.id === id
-        );
+      return resultData as ComputeResult;
+    }
+  }
+  throw new Error("Failed to fetch test result");
+}
+onLoad(async (options: any) => {
+  const { type, id, testJson } = options;
+  console.log("type", type, "id", id);
+  if (type === "test") {
+    try {
+      if (testJson) {
+        // 解码并解析测试数据
+        const decodedJson = decodeURIComponent(testJson);
+        const test = JSON.parse(decodedJson);
         uni.setNavigationBarTitle({
-          title: result?.test.name || "测试结果",
+          title: test.name || "测试结果",
         });
+        // 获取测试结果
+        const result = await fetchTestResult(id, test.items);
+        console.log("result", result);
 
-        resultInfo.value = result;
+        // 生成结果对象
+        const resultItem: ResultItem = {
+          id: Date.now().toString(),
+          test: {
+            id: test.id,
+            name: test.name,
+            description: test.description,
+            userCount: test.userCount,
+            questionCount: test.questionCount,
+            duration: test.duration,
+            type: test.type,
+            source: test.source,
+            soloChoice: test.soloChoice,
+          },
+          introTexts: result.summary,
+          completedDate: Date.now(),
+          score: result.score,
+          scoreText: result.level,
+          suggest: test.suggest,
+        };
+
+        // 保存到 store
+        store.dispatch("test/addTestResult", resultItem);
+        resultInfo.value = resultItem;
       }
+    } catch (e) {
+      console.error("获取测试结果失败:", e);
+      uni.showToast({
+        title: "获取结果失败",
+        icon: "none",
+      });
+    } finally {
+      isLoading.value = false;
+    }
+  } else if (type === "history") {
+    const result = store.state.test.historyResults.find(
+      (item: ResultItem) => item.id === id
+    );
+    uni.setNavigationBarTitle({
+      title: result?.test.name || "测试结果",
     });
 
-    const shareResult = () => {
-      uni.showShareMenu({
-        withShareTicket: true,
-      });
-    };
+    resultInfo.value = result;
+  }
+});
 
-    const goBack = () => {
-      uni.navigateBack({
-        delta: 100, // 返回的页面数，如果 delta 大于现有页面数，则返回到首页
-      });
-    };
+function goBack() {
+  uni.navigateBack({
+    delta: 100, // 返回的页面数，如果 delta 大于现有页面数，则返回到首页
+  });
+}
 
-    return {
-      manifest,
-      resultInfo,
-      isLoading,
-      shareResult,
-      goBack,
-    };
-  },
+onShareAppMessage(() => {
+  return {
+    title: `${manifest.name} · 测评结果`,
+    path: "/pages/index/index",
+    imageUrl: "/static/images/share-cover.png",
+  };
 });
 </script>
 
