@@ -19,7 +19,7 @@
                 mode="aspectFit"
                 class="check-icon"
               />
-              <text>纯绿色，不收费，无广告</text>
+              <text>初见如蓝，宁静致远</text>
             </view>
           </view>
 
@@ -123,7 +123,7 @@ export default defineComponent({
   padding: 30rpx;
   padding-bottom: 40rpx;
   border-radius: 20rpx;
-  background: linear-gradient(180deg, #7fde87 0%, #ffffff 100%);
+  background: linear-gradient(180deg, #504af4 0%, #ffffff 100%);
   // background: blue;
 }
 .test-header {

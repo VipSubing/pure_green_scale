@@ -1,7 +1,7 @@
 <template>
   <view class="test-intro">
     <!-- 根据pageLoading==true显示加载中,否则显示页面内容 -->
-    <view v-if="share" class="loading-state">
+    <view v-if="share && loadStatus !== 1" class="loading-state">
       <text @click="loadStatus === 2 ? loadData() : null">{{
         loadStatus === 0
           ? "加载中..."
@@ -11,7 +11,12 @@
       }}</text>
     </view>
     <!-- 主要内容区域 -->
-    <scroll-view v-else scroll-y :show-scrollbar="false" class="content-scroll">
+    <scroll-view
+      v-if="!share || loadStatus === 1"
+      scroll-y
+      :show-scrollbar="false"
+      class="content-scroll"
+    >
       <!-- 头部Logo和标题 -->
       <view class="header">
         <!-- <image src="/static/images/health-logo.png" mode="aspectFit" class="logo" /> -->
@@ -137,12 +142,25 @@ async function loadData() {
       testInfo.value = store.state.test.testItems.find(
         (item) => item.id === id.value
       );
-      await loadResources(id.value);
+      if (!testInfo.value) {
+        throw new Error("Test not found");
+      }
+      testInfo.value.items = await loadResources(id.value);
     }
     loadStatus.value = 1;
   } catch (e) {
     loadStatus.value = 2;
   }
+}
+
+// 资源加载函数
+async function loadResources(id: string): Promise<TestItem[]> {
+  let questions = loadQuestionsFromCache(id);
+  if (!questions) {
+    questions = await loadRemoteQuestions(id);
+    saveQuestionsToCache(id, questions);
+  }
+  return questions;
 }
 // 缓存相关函数
 function loadQuestionsFromCache(id: string): TestItem[] | null {
@@ -156,7 +174,7 @@ function loadQuestionsFromCache(id: string): TestItem[] | null {
   }
 }
 
-function saveQuestionsToCache(id: string, questions: TestItem[]) {
+async function saveQuestionsToCache(id: string, questions: TestItem[]) {
   try {
     const key = `questions_${id}`;
     uni.setStorageSync(key, JSON.stringify(questions));
@@ -166,7 +184,7 @@ function saveQuestionsToCache(id: string, questions: TestItem[]) {
 }
 
 // API 请求函数
-async function loadRemoteQuestions(id: string): Promise<TestItem[] | null> {
+async function loadRemoteQuestions(id: string): Promise<TestItem[]> {
   const response = await uni.request({
     url: QUESTIONS_BASE_URL,
     method: "POST",
@@ -179,22 +197,12 @@ async function loadRemoteQuestions(id: string): Promise<TestItem[] | null> {
   if (response.statusCode === 200 && response.data) {
     const result = response.data as ResultResponse;
     if (result.code === 200) {
-      saveQuestionsToCache(id, result.data as TestItem[]);
       return result.data as TestItem[];
     }
   }
-  return null;
+  throw new Error("Failed to load questions");
 }
 
-// 资源加载函数
-async function loadResources(id: string) {
-  const cachedQuestions = loadQuestionsFromCache(id);
-  if (cachedQuestions) {
-    loadRemoteQuestions(id);
-  } else {
-    await loadRemoteQuestions(id);
-  }
-}
 async function loadTestInfo(id: string): Promise<TestPaperItem> {
   const response = await uni.request({
     url: TEST_INFO_BASE_URL + "?id=" + id,
