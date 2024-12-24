@@ -193,7 +193,7 @@ function goBack() {
 onShareAppMessage(() => {
   return {
     title: resultInfo.value?.test.name || "心理测评",
-    path: `/pages/test-intro/index?id=${resultInfo.value?.test.id}`,
+    path: `/pages/test-intro/index?id=${resultInfo.value?.test.id}&share=true`,
   };
 });
 </script>

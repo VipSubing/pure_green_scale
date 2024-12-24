@@ -1,7 +1,17 @@
 <template>
   <view class="test-intro">
+    <!-- 根据pageLoading==true显示加载中,否则显示页面内容 -->
+    <view v-if="share" class="loading-state">
+      <text @click="loadStatus === 2 ? loadData() : null">{{
+        loadStatus === 0
+          ? "加载中..."
+          : loadStatus === 2
+          ? "加载失败，点击重试"
+          : "加载完成"
+      }}</text>
+    </view>
     <!-- 主要内容区域 -->
-    <scroll-view scroll-y :show-scrollbar="false" class="content-scroll">
+    <scroll-view v-else scroll-y :show-scrollbar="false" class="content-scroll">
       <!-- 头部Logo和标题 -->
       <view class="header">
         <!-- <image src="/static/images/health-logo.png" mode="aspectFit" class="logo" /> -->
@@ -69,30 +79,60 @@
       <button
         class="start-btn"
         @tap="startTest"
-        :disabled="isLoading || loadFailed"
+        :disabled="loadStatus === 0 || loadStatus === 2"
       >
-        {{ isLoading ? "资源加载中..." : loadFailed ? "加载失败" : "开始测评" }}
+        {{
+          loadStatus === 0
+            ? "资源加载中..."
+            : loadStatus === 2
+            ? "加载失败"
+            : "开始测评"
+        }}
       </button>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from "vue";
+import { ref, computed } from "vue";
 import { onLoad, onShareAppMessage } from "@dcloudio/uni-app";
 import type { TestPaperItem, TestItem, ResultResponse } from "@/types/test";
 import { useStore } from "@/store";
 
 const QUESTIONS_BASE_URL = "https://subing.site/scale/api/questions";
-
+const TEST_INFO_BASE_URL = "https://subing.site/scale/api/testInfo";
 // 响应式状态
 const testInfo = ref<TestPaperItem>();
-const isLoading = ref(false);
-const loadFailed = ref(false);
+// ! 0: 加载中 1: 加载完成 2: 加载失败
+const loadStatus = ref(0);
+const share = ref(false);
+const id = ref("");
 
-// 添加响应式变量存储分享图片
-const shareImageUrl = ref("/static/images/share-cover.png");
-
+onLoad(async (options: any) => {
+  share.value = options.share === "true";
+  id.value = options.id;
+  console.log("share :", share.value);
+  console.log("id :", id.value);
+  loadData();
+});
+async function loadData() {
+  loadStatus.value = 0;
+  try {
+    if (share.value) {
+      // 通过id获取远程测试信息
+      testInfo.value = await loadTestInfo(id.value);
+    } else {
+      const store = useStore();
+      testInfo.value = store.state.test.testItems.find(
+        (item) => item.id === id.value
+      );
+      await loadResources(id.value);
+    }
+    loadStatus.value = 1;
+  } catch (e) {
+    loadStatus.value = 2;
+  }
+}
 // 缓存相关函数
 function loadQuestionsFromCache(id: string): TestItem[] | null {
   try {
@@ -137,31 +177,32 @@ async function loadRemoteQuestions(id: string): Promise<TestItem[] | null> {
 
 // 资源加载函数
 async function loadResources(id: string) {
-  isLoading.value = true;
-  loadFailed.value = false;
-  try {
-    const cachedQuestions = loadQuestionsFromCache(id);
-    if (cachedQuestions) {
-      loadRemoteQuestions(id);
-    } else {
-      await loadRemoteQuestions(id);
-    }
-  } catch (e) {
-    console.error("Failed to load resources:", e);
-    uni.showToast({
-      title: "资源加载失败",
-      icon: "none",
-    });
-    loadFailed.value = true;
-  } finally {
-    isLoading.value = false;
+  const cachedQuestions = loadQuestionsFromCache(id);
+  if (cachedQuestions) {
+    loadRemoteQuestions(id);
+  } else {
+    await loadRemoteQuestions(id);
   }
 }
+async function loadTestInfo(id: string): Promise<TestPaperItem> {
+  const response = await uni.request({
+    url: TEST_INFO_BASE_URL + "?id=" + id,
+    method: "GET",
+    header: {
+      "Content-Type": "application/json",
+    },
+  });
 
+  if (response.statusCode === 200 && response.data) {
+    const result = response.data as ResultResponse;
+    if (result.code === 200) {
+      return result.data as TestPaperItem;
+    }
+  }
+  throw new Error("Failed to load test info");
+}
 // 开始测试
 function startTest() {
-  if (isLoading.value) return;
-
   if (testInfo.value) {
     uni.navigateTo({
       url: `/pages/test/index?type=${testInfo.value.id}`,
@@ -169,20 +210,11 @@ function startTest() {
   }
 }
 
-// 页面加载完成后生成分享图片
-onLoad(async (options: any) => {
-  const store = useStore();
-  testInfo.value = store.state.test.testItems.find(
-    (item) => item.id === options.id
-  );
-  loadResources(options.id);
-});
-
 // 分享配置直接使用生成好的图片
 onShareAppMessage(() => {
   return {
     title: testInfo.value?.name || "心理测评",
-    path: `/pages/test-intro/index?id=${testInfo.value?.id}`,
+    path: `/pages/test-intro/index?id=${testInfo.value?.id}&share=true`,
     // imageUrl: shareImageUrl.value,
   };
 });
@@ -361,6 +393,18 @@ onShareAppMessage(() => {
       transform: scale(0.8);
       line-height: normal;
     }
+  }
+}
+
+.loading-state {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text {
+    font-size: $uni-font-size-lg;
+    color: $uni-text-color-placeholder;
   }
 }
 </style>
