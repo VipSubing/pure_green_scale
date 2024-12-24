@@ -87,7 +87,7 @@ import { useStore } from "@/store";
 import type { ResultItem, ComputeResult, ResultResponse } from "@/types/test";
 import manifest from "@/manifest.json";
 
-const RESULT_API = "http://subing.site/scale/api/compute";
+const RESULT_API = "https://subing.site/scale/api/compute";
 
 export default defineComponent({
   name: "TestResult",

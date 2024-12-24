@@ -12,13 +12,7 @@
       "style": {
         "navigationBarTitleText": "",
         "navigationBarBackgroundColor": "#FFFFFF",
-        "navigationBarTextStyle": "black",
-        "app-plus": {
-          "bounce": "none",
-          "titleNView": {
-            "backButtonOffset": "10rpx"
-          }
-        }
+        "navigationBarTextStyle": "black"
       }
     },
     {
@@ -26,20 +20,7 @@
       "style": {
         "navigationBarTitleText": "测评介绍",
         "navigationBarBackgroundColor": "#FFFFFF",
-        "navigationBarTextStyle": "black",
-        "app-plus": {
-          "bounce": "none",
-          "titleNView": {
-            "buttons": [
-              {
-                "text": "\ue60e",
-                "fontSrc": "/static/fonts/iconfont.ttf",
-                "fontSize": "22px",
-                "color": "#333333"
-              }
-            ]
-          }
-        }
+        "navigationBarTextStyle": "black"
       }
     },
     {
@@ -78,12 +59,7 @@
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "纯绿心理测验",
     "navigationBarBackgroundColor": "#FFFFFF",
-    "backgroundColor": "#F5F6FA",
-    "app-plus": {
-      "titleNView": {
-        "backButtonOffset": "10rpx"
-      }
-    }
+    "backgroundColor": "#F5F6FA"
   },
 
   "easycom": {

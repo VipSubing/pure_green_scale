@@ -58,7 +58,7 @@
 
     <!-- 底部按钮区 -->
     <view class="footer">
-      <button class="share-btn" @tap="handleShare">
+      <button open-type="share" class="share-btn">
         <image
           src="/static/images/share.png"
           mode="aspectFit"
@@ -74,132 +74,124 @@
         {{ isLoading ? "资源加载中..." : loadFailed ? "加载失败" : "开始测评" }}
       </button>
     </view>
+
+    <canvas
+      canvas-id="shareCanvas"
+      style="position: fixed; left: -9999px"
+    ></canvas>
   </view>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
+<script setup lang="ts">
+import { ref, nextTick } from "vue";
+import { onLoad, onShareAppMessage } from "@dcloudio/uni-app";
 import type { TestPaperItem, TestItem, ResultResponse } from "@/types/test";
 import { useStore } from "@/store";
 
-const QUESTIONS_BASE_URL = "http://subing.site/scale/api/questions";
+const QUESTIONS_BASE_URL = "https://subing.site/scale/api/questions";
 
-export default defineComponent({
-  name: "TestIntro",
-  setup() {
-    const store = useStore();
-    const testInfo = ref<TestPaperItem>();
-    const isLoading = ref(false);
-    const loadFailed = ref(false);
+// 响应式状态
+const testInfo = ref<TestPaperItem>();
+const isLoading = ref(false);
+const loadFailed = ref(false);
 
-    // 从本地缓存加载题目
-    const loadQuestionsFromCache = (id: string): TestItem[] | null => {
-      try {
-        const key = `questions_${id}`;
-        const cached = uni.getStorageSync(key);
-        return cached ? JSON.parse(cached) : null;
-      } catch (e) {
-        console.error("Failed to load questions from cache:", e);
-        return null;
-      }
-    };
+// 添加响应式变量存储分享图片
+const shareImageUrl = ref("/static/images/share-cover.png");
 
-    // 保存题目到本地缓存
-    const saveQuestionsToCache = (id: string, questions: TestItem[]) => {
-      try {
-        const key = `questions_${id}`;
-        uni.setStorageSync(key, JSON.stringify(questions));
-      } catch (e) {
-        console.error("Failed to save questions to cache:", e);
-      }
-    };
+// 缓存相关函数
+function loadQuestionsFromCache(id: string): TestItem[] | null {
+  try {
+    const key = `questions_${id}`;
+    const cached = uni.getStorageSync(key);
+    return cached ? JSON.parse(cached) : null;
+  } catch (e) {
+    console.error("Failed to load questions from cache:", e);
+    return null;
+  }
+}
 
-    // 加载远端题目数据
-    const loadRemoteQuestions = async (
-      id: string
-    ): Promise<TestItem[] | null> => {
-      const response = await uni.request({
-        url: QUESTIONS_BASE_URL,
-        method: "POST",
-        header: {
-          "Content-Type": "application/json",
-        },
-        data: {
-          id,
-        },
-      });
+function saveQuestionsToCache(id: string, questions: TestItem[]) {
+  try {
+    const key = `questions_${id}`;
+    uni.setStorageSync(key, JSON.stringify(questions));
+  } catch (e) {
+    console.error("Failed to save questions to cache:", e);
+  }
+}
 
-      if (response.statusCode === 200 && response.data) {
-        const result = response.data as ResultResponse;
-        if (result.code === 200) {
-          saveQuestionsToCache(id, result.data as TestItem[]);
-          return result.data as TestItem[];
-        }
-      }
-      return null;
-    };
+// API 请求函数
+async function loadRemoteQuestions(id: string): Promise<TestItem[] | null> {
+  const response = await uni.request({
+    url: QUESTIONS_BASE_URL,
+    method: "POST",
+    header: {
+      "Content-Type": "application/json",
+    },
+    data: { id },
+  });
 
-    onLoad((options: any) => {
-      const testId = options.id;
-      testInfo.value = store.state.test.testItems.find(
-        (item) => item.id === testId
-      );
-      // 预加载资源
-      loadResources(testId);
+  if (response.statusCode === 200 && response.data) {
+    const result = response.data as ResultResponse;
+    if (result.code === 200) {
+      saveQuestionsToCache(id, result.data as TestItem[]);
+      return result.data as TestItem[];
+    }
+  }
+  return null;
+}
+
+// 资源加载函数
+async function loadResources(id: string) {
+  isLoading.value = true;
+  loadFailed.value = false;
+  try {
+    const cachedQuestions = loadQuestionsFromCache(id);
+    if (cachedQuestions) {
+      loadRemoteQuestions(id);
+    } else {
+      await loadRemoteQuestions(id);
+    }
+  } catch (e) {
+    console.error("Failed to load resources:", e);
+    uni.showToast({
+      title: "资源加载失败",
+      icon: "none",
     });
+    loadFailed.value = true;
+  } finally {
+    isLoading.value = false;
+  }
+}
 
-    // 加载所需资源
-    const loadResources = async (id: string) => {
-      isLoading.value = true;
-      loadFailed.value = false;
-      try {
-        // 只加载题目数据
-        const cachedQuestions = loadQuestionsFromCache(id);
-        if (cachedQuestions) {
-          // 如果有缓存,异步更新
-          loadRemoteQuestions(id);
-        } else {
-          // 如果没有缓存,同步加载
-          await loadRemoteQuestions(id);
-        }
-      } catch (e) {
-        console.error("Failed to load resources:", e);
-        uni.showToast({
-          title: "资源加载失败",
-          icon: "none",
-        });
-        loadFailed.value = true;
-      } finally {
-        isLoading.value = false;
-      }
-    };
+// 开始测试
+function startTest() {
+  if (isLoading.value) return;
 
-    const startTest = () => {
-      if (isLoading.value) return;
+  if (testInfo.value) {
+    uni.navigateTo({
+      url: `/pages/test/index?type=${testInfo.value.id}`,
+    });
+  }
+}
 
-      if (testInfo.value) {
-        uni.navigateTo({
-          url: `/pages/test/index?type=${testInfo.value.id}`,
-        });
-      }
-    };
-
-    const handleShare = () => {
-      uni.showShareMenu({
-        withShareTicket: true,
-      });
-    };
-
-    return {
-      testInfo,
-      isLoading,
-      loadFailed,
-      startTest,
-      handleShare,
-    };
-  },
+// 页面加载完成后生成分享图片
+onLoad(async (options: any) => {
+  const store = useStore();
+  testInfo.value = store.state.test.testItems.find(
+    (item) => item.id === options.id
+  );
+  loadResources(options.id);
 });
+
+// 分享配置直接使用生成好的图片
+onShareAppMessage(() => {
+  return {
+    title: testInfo.value?.name || "心理测评",
+    path: `/pages/test-intro/index?id=${testInfo.value?.id}`,
+    // imageUrl: shareImageUrl.value,
+  };
+});
+// 无需显式导出，setup 语法糖会自动暴露模板需要的内容
 </script>
 
 <style lang="scss">
