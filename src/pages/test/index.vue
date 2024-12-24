@@ -68,8 +68,7 @@
 import { defineComponent, ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { useStore } from "@/store";
-import type { ResultItem, TestPaperItem } from "@/types/test";
-import test from "@/store/modules/test";
+import type { TestPaperItem } from "@/types/test";
 
 export default defineComponent({
   name: "TestPage",

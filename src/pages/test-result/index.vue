@@ -93,37 +93,6 @@ const store = useStore();
 const resultInfo = ref<ResultItem>();
 const isLoading = ref(false);
 
-// 从服务器获取测试结果
-async function fetchTestResult(
-  testId: string,
-  items: any[]
-): Promise<ComputeResult> {
-  const response = await uni.request({
-    url: RESULT_API,
-    method: "POST",
-    data: {
-      items,
-      id: testId,
-    },
-    header: {
-      "content-type": "application/json",
-    },
-  });
-  console.log("response", response);
-  if (response.statusCode === 200 && response.data) {
-    const resultResponse = response.data as ResultResponse;
-    if (resultResponse.code === 200) {
-      // 如果返回的是字符串，需要解析
-      const resultData =
-        typeof resultResponse.data === "string"
-          ? JSON.parse(resultResponse.data)
-          : resultResponse.data;
-
-      return resultData as ComputeResult;
-    }
-  }
-  throw new Error("Failed to fetch test result");
-}
 onLoad(async (options: any) => {
   const { type, id, testJson } = options;
   console.log("type", type, "id", id);
@@ -184,10 +153,48 @@ onLoad(async (options: any) => {
   }
 });
 
-function goBack() {
-  uni.navigateBack({
-    delta: 100, // 返回的页面数，如果 delta 大于现有页面数，则返回到首页
+// 从服务器获取测试结果
+async function fetchTestResult(
+  testId: string,
+  items: any[]
+): Promise<ComputeResult> {
+  const response = await uni.request({
+    url: RESULT_API,
+    method: "POST",
+    data: {
+      items,
+      id: testId,
+    },
+    header: {
+      "content-type": "application/json",
+    },
   });
+  console.log("response", response);
+  if (response.statusCode === 200 && response.data) {
+    const resultResponse = response.data as ResultResponse;
+    if (resultResponse.code === 200) {
+      // 如果返回的是字符串，需要解析
+      const resultData =
+        typeof resultResponse.data === "string"
+          ? JSON.parse(resultResponse.data)
+          : resultResponse.data;
+
+      return resultData as ComputeResult;
+    }
+  }
+  throw new Error("Failed to fetch test result");
+}
+
+function goBack() {
+  if (store.state.share.isFromShare) {
+    uni.reLaunch({
+      url: "/pages/index/index",
+    });
+  } else {
+    uni.navigateBack({
+      delta: 100, // 返回的页面数，如果 delta 大于现有页面数，则返回到首页
+    });
+  }
 }
 
 onShareAppMessage(() => {

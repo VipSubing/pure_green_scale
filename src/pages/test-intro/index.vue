@@ -108,9 +108,20 @@ const loadStatus = ref(0);
 const share = ref(false);
 const id = ref("");
 
+const store = useStore();
+
 onLoad(async (options: any) => {
+  // 使用store中的状态
+
   share.value = options.share === "true";
   id.value = options.id;
+  if (share.value) {
+    // 设置分享状态
+    store.dispatch("share/setShareStatus", {
+      isFromShare: true,
+      testId: id.value,
+    });
+  }
   console.log("share :", share.value);
   console.log("id :", id.value);
   loadData();
