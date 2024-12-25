@@ -293,7 +293,7 @@ export default defineComponent({
   }
 
   .answer-list {
-    margin-top: $uni-spacing-row-lg;
+    margin-top: calc($uni-spacing-row-lg + 20rpx);
     .answer-item {
       padding: $uni-spacing-row-lg;
       background: $uni-bg-color-grey;

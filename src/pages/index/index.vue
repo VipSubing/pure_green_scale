@@ -26,12 +26,13 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { onShow, onReady } from "@dcloudio/uni-app";
+import { onShow, onReady, onShareAppMessage } from "@dcloudio/uni-app";
 import { useStore } from "@/store";
 import NavTabs from "@/components/NavTabs.vue";
 import TestArea from "@/pages/test-area/index.vue";
 import AllTests from "@/pages/all-tests/index.vue";
 import HistoryTests from "@/pages/history-tests/index.vue";
+import manifest from "@/manifest.json";
 // 引入组件
 
 const store = useStore();
@@ -43,6 +44,16 @@ onReady(() => {
   console.log("index page onReady");
   store.dispatch("share/clearShareStatus");
 });
+
+// 分享配置直接使用生成好的图片
+onShareAppMessage(() => {
+  return {
+    title: manifest.name,
+    path: `/pages/index/index`,
+    // imageUrl: shareImageUrl.value,
+  };
+});
+
 const tabs = ["热门推荐", "全部测评", "历史测评"];
 const currentTab = ref(0);
 
