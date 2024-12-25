@@ -86,8 +86,9 @@ import { onLoad, onShareAppMessage } from "@dcloudio/uni-app";
 import { useStore } from "@/store";
 import type { ResultItem, ComputeResult, ResultResponse } from "@/types/test";
 import manifest from "@/manifest.json";
+import { API_URLS } from "@/config/api";
 
-const RESULT_API = "https://subing.site/scale/api/compute";
+const RESULT_API = API_URLS.COMPUTE;
 
 const store = useStore();
 const resultInfo = ref<ResultItem>();

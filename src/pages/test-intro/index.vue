@@ -103,9 +103,10 @@ import { ref, computed } from "vue";
 import { onLoad, onShareAppMessage } from "@dcloudio/uni-app";
 import type { TestPaperItem, TestItem, ResultResponse } from "@/types/test";
 import { useStore } from "@/store";
+import { API_URLS } from "@/config/api";
 
-const QUESTIONS_BASE_URL = "https://subing.site/scale/api/questions";
-const TEST_INFO_BASE_URL = "https://subing.site/scale/api/testInfo";
+const QUESTIONS_BASE_URL = API_URLS.QUESTIONS;
+const TEST_INFO_BASE_URL = API_URLS.TEST_INFO;
 // 响应式状态
 const testInfo = ref<TestPaperItem>();
 // ! 0: 加载中 1: 加载完成 2: 加载失败

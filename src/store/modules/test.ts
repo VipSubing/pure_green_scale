@@ -1,10 +1,11 @@
 import type { TestPaperItem, ResultItem, ResultResponse } from "@/types/test";
+import { API_URLS } from "@/config/api";
 
 const HISTORY_STORAGE_KEY = "test_history_results";
 const RECOMMENDED_TESTS_STORAGE_KEY = "recommended_tests";
 const ALL_TESTS_STORAGE_KEY = "all_tests";
-const RECOMMENDED_TESTS_URL = "https://subing.site/scale/api/pro-test";
-const ALL_TESTS_URL = "https://subing.site/scale/api/all-test";
+const RECOMMENDED_TESTS_URL = API_URLS.PRO_TEST;
+const ALL_TESTS_URL = API_URLS.ALL_TEST;
 
 // 从本地缓存加载历史记录
 const loadHistoryFromStorage = (): ResultItem[] => {
