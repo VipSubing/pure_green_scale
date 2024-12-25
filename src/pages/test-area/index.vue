@@ -114,9 +114,7 @@ export default defineComponent({
   .wrap {
     height: auto;
     padding: 30rpx;
-
-    // 默认 padding-bottom
-    // padding-bottom: 20rpx + $safe-area-inset-bottom;
+    padding-bottom: calc(100rpx + $safe-area-inset-bottom);
   }
 }
 .big-box {

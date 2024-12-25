@@ -66,7 +66,7 @@
 
         <!-- 隐私提示 -->
         <view class="privacy-notice">
-          本测试将收集您选择/填写的信息以计算结果，点击开始测评意为您已知悉并同意腾讯健康进行收集。
+          本测试将收集您选择/填写的信息以计算结果，点击开始测评意为您已知悉并同意进行收集。
         </view>
       </view>
     </scroll-view>
@@ -253,6 +253,7 @@ onShareAppMessage(() => {
   flex: 1;
   padding: 30rpx;
   box-sizing: border-box;
+  margin-bottom: calc(100rpx + $safe-area-inset-bottom);
   // &::-webkit-scrollbar {
   //     display: none;
   // }
@@ -364,6 +365,10 @@ onShareAppMessage(() => {
 }
 
 .footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   gap: 20rpx;

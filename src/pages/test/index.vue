@@ -138,8 +138,11 @@ export default defineComponent({
 
     // 处理答案选择
     const handleAnswer = (answerIndex: number) => {
-      // 如果点击被锁定，直接返回
-      if (isClickLocked.value) return;
+      const isDev = process.env.NODE_ENV === "development";
+      if (!isDev) {
+        // 如果点击被锁定，直接返回
+        if (isClickLocked.value) return;
+      }
 
       // 锁定点击
       isClickLocked.value = true;
