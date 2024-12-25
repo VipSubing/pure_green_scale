@@ -19,7 +19,7 @@
                 mode="aspectFit"
                 class="check-icon"
               />
-              <text>初见如蓝，宁静致远</text>
+              <text>初见如蓝，公益免费无广告</text>
             </view>
           </view>
 
@@ -121,7 +121,7 @@ export default defineComponent({
 }
 .big-box {
   padding: 30rpx;
-  padding-bottom: 40rpx;
+  padding-bottom: 60rpx;
   border-radius: 20rpx;
   background: linear-gradient(180deg, #504af4 0%, #ffffff 100%);
   // background: blue;
@@ -131,7 +131,7 @@ export default defineComponent({
   .title {
     font-size: $uni-font-size-title;
     font-weight: bold;
-    color: $uni-text-color;
+    color: white;
   }
 
   .subtitle {

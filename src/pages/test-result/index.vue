@@ -97,6 +97,7 @@ onLoad(async (options: any) => {
   const { type, id, testJson } = options;
   console.log("type", type, "id", id);
   if (type === "test") {
+    isLoading.value = true;
     try {
       if (testJson) {
         // 解码并解析测试数据
