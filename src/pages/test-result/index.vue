@@ -1,7 +1,15 @@
 <template>
   <view class="container">
+    <!-- 加载状态 -->
+    <view v-if="pageType === 'test' && loadStatus !== 1" class="loading-state">
+      <text @click="loadStatus === 2 ? retryCompute() : null">{{
+        loadStatus === 0 ? "计算结果中..." : "加载失败，点击重试"
+      }}</text>
+    </view>
+
     <!-- 可滚动内容区域 -->
     <scroll-view
+      v-else
       scroll-y
       class="content-scroll"
       :bounces="true"
@@ -9,13 +17,8 @@
       :enhanced="true"
       :show-scrollbar="false"
     >
-      <!-- 加载状态 -->
-      <view v-if="isLoading" class="loading-state">
-        <text>计算结果中...</text>
-      </view>
-
       <!-- 结果内容 -->
-      <view v-else class="content">
+      <view class="content">
         <!-- 头部标题 -->
         <view class="header">
           <text class="title">{{ manifest.name }} · 测评结果</text>
@@ -84,7 +87,12 @@
 import { ref } from "vue";
 import { onLoad, onShareAppMessage } from "@dcloudio/uni-app";
 import { useStore } from "@/store";
-import type { ResultItem, ComputeResult, ResultResponse } from "@/types/test";
+import type {
+  ResultItem,
+  ComputeResult,
+  ResultResponse,
+  TestPaperItem,
+} from "@/types/test";
 import manifest from "@/manifest.json";
 import { API_URLS } from "@/config/api";
 
@@ -92,60 +100,30 @@ const RESULT_API = API_URLS.COMPUTE;
 
 const store = useStore();
 const resultInfo = ref<ResultItem>();
-const isLoading = ref(false);
+// 加载状态 0: 加载中 1: 加载完成 2: 加载失败
+const loadStatus = ref(0);
+const pageType = ref("");
+var paperItem: TestPaperItem;
+var paperId: string;
 
 onLoad(async (options: any) => {
   const { type, id, testJson } = options;
   console.log("type", type, "id", id);
+  pageType.value = type;
+
   if (type === "test") {
-    isLoading.value = true;
-    try {
-      if (testJson) {
-        // 解码并解析测试数据
-        const decodedJson = decodeURIComponent(testJson);
-        const test = JSON.parse(decodedJson);
-        uni.setNavigationBarTitle({
-          title: test.name || "测试结果",
-        });
-        // 获取测试结果
-        const result = await fetchTestResult(id, test.items);
-        console.log("result", result);
+    // 解码并解析测试数据
+    const decodedJson = decodeURIComponent(testJson);
+    const test = JSON.parse(decodedJson);
 
-        // 生成结果对象
-        const resultItem: ResultItem = {
-          id: Date.now().toString(),
-          test: {
-            id: test.id,
-            name: test.name,
-            description: test.description,
-            userCount: test.userCount,
-            questionCount: test.questionCount,
-            duration: test.duration,
-            type: test.type,
-            source: test.source,
-            soloChoice: test.soloChoice,
-          },
-          introTexts: result.summary,
-          completedDate: Date.now(),
-          score: result.score,
-          scoreText: result.level,
-          suggest: test.suggest,
-        };
-
-        // 保存到 store
-        store.dispatch("test/addTestResult", resultItem);
-        resultInfo.value = resultItem;
-      }
-    } catch (e) {
-      console.error("获取测试结果失败:", e);
-      uni.showToast({
-        title: "获取结果失败",
-        icon: "none",
-      });
-    } finally {
-      isLoading.value = false;
-    }
+    paperItem = test;
+    paperId = id;
+    uni.setNavigationBarTitle({
+      title: test.name || "测试结果",
+    });
+    retryCompute();
   } else if (type === "history") {
+    loadStatus.value = 1;
     resultInfo.value = store.state.test.historyResults.find(
       (item: ResultItem) => item.id === id
     );
@@ -196,6 +174,50 @@ function goBack() {
     uni.navigateBack({
       delta: 100, // 返回的页面数，如果 delta 大于现有页面数，则返回到首页
     });
+  }
+}
+
+async function retryCompute() {
+  try {
+    loadStatus.value = 0;
+    if (paperItem.items) {
+      // 获取测试结果
+      const result = await fetchTestResult(paperId, paperItem.items);
+      console.log("result", result);
+
+      // 生成结果对象
+      const resultItem: ResultItem = {
+        id: Date.now().toString(),
+        test: {
+          id: paperItem.id,
+          name: paperItem.name,
+          description: paperItem.description,
+          userCount: paperItem.userCount,
+          questionCount: paperItem.questionCount,
+          duration: paperItem.duration,
+          type: paperItem.type,
+          source: paperItem.source,
+          soloChoice: paperItem.soloChoice,
+        },
+        introTexts: result.summary,
+        completedDate: Date.now(),
+        score: result.score,
+        scoreText: result.level,
+        suggest: paperItem.suggest,
+      };
+
+      // 保存到 store
+      store.dispatch("test/addTestResult", resultItem);
+      resultInfo.value = resultItem;
+      loadStatus.value = 1;
+    }
+  } catch (e) {
+    console.error("获取测试结果失败:", e);
+    uni.showToast({
+      title: "获取结果失败",
+      icon: "none",
+    });
+    loadStatus.value = 2;
   }
 }
 

@@ -78,6 +78,10 @@ export default defineComponent({
     const currentIndex = ref(0);
     const answers = ref<number[]>([]);
 
+    // 添加点击锁定状态
+    const isClickLocked = ref(false);
+    const CLICK_DELAY = 1000; // 点击间隔时间，单位毫秒
+
     // 当前问题
     const currentQuestion = computed(() => {
       return testPaper.value?.items?.[currentIndex.value];
@@ -134,6 +138,12 @@ export default defineComponent({
 
     // 处理答案选择
     const handleAnswer = (answerIndex: number) => {
+      // 如果点击被锁定，直接返回
+      if (isClickLocked.value) return;
+
+      // 锁定点击
+      isClickLocked.value = true;
+
       if (!testPaper.value || !currentQuestion.value) return;
 
       if (testPaper.value.soloChoice) {
@@ -146,6 +156,11 @@ export default defineComponent({
         setTimeout(() => {
           nextQuestion();
         }, 300);
+
+        // 延迟解锁点击
+        setTimeout(() => {
+          isClickLocked.value = false;
+        }, CLICK_DELAY);
       } else {
         // 多选模式：切换选中状态
         currentQuestion.value.answers[answerIndex].selected =
