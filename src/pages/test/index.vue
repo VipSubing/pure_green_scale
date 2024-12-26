@@ -64,183 +64,173 @@
   </view>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, computed } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import { onLoad, onShareAppMessage } from "@dcloudio/uni-app";
 import { useStore } from "@/store";
 import type { TestPaperItem } from "@/types/test";
+import manifest from "@/manifest.json";
+const store = useStore();
+const testPaper = ref<TestPaperItem>();
+const currentIndex = ref(0);
+const answers = ref<number[]>([]);
 
-export default defineComponent({
-  name: "TestPage",
-  setup() {
-    const store = useStore();
-    const testPaper = ref<TestPaperItem>();
-    const currentIndex = ref(0);
-    const answers = ref<number[]>([]);
+// 添加点击锁定状态
+const isClickLocked = ref(false);
+const CLICK_DELAY = 1000; // 点击间隔时间，单位毫秒
 
-    // 添加点击锁定状态
-    const isClickLocked = ref(false);
-    const CLICK_DELAY = 1000; // 点击间隔时间，单位毫秒
-
-    // 当前问题
-    const currentQuestion = computed(() => {
-      return testPaper.value?.items?.[currentIndex.value];
-    });
-
-    // 是否是最后一题
-    const isLastQuestion = computed(() => {
-      return currentIndex.value === (testPaper.value?.items?.length || 0) - 1;
-    });
-
-    // 是否已选择答案（用于多选时判断是否可以进入下一题）
-    const hasSelectedAnswer = computed(() => {
-      return currentQuestion.value?.answers.some((answer) => answer.selected);
-    });
-
-    // 重置所有答案的选中状态
-    const resetAnswers = (paper: TestPaperItem) => {
-      if (paper.items) {
-        paper.items.forEach((item) => {
-          item.answers.forEach((answer) => {
-            answer.selected = undefined;
-          });
-        });
-      }
-    };
-
-    onLoad((options: any) => {
-      const testId = options.type;
-      const test = store.state.test.testItems.find(
-        (item) => item.id === testId
-      );
-      if (test) {
-        // 从缓存获取题目数据
-        const key = `questions_${testId}`;
-        const cachedQuestions = uni.getStorageSync(key);
-        if (cachedQuestions) {
-          const questions = JSON.parse(cachedQuestions);
-          testPaper.value = {
-            ...test,
-            items: questions,
-          };
-          resetAnswers(testPaper.value);
-        }
-      }
-
-      answers.value = new Array(testPaper.value?.items?.length || 0).fill(-1);
-
-      if (testPaper.value) {
-        uni.setNavigationBarTitle({
-          title: testPaper.value.name,
-        });
-      }
-    });
-
-    // 处理答案选择
-    const handleAnswer = (answerIndex: number) => {
-      const isDev = process.env.NODE_ENV === "development";
-      if (!isDev) {
-        // 如果点击被锁定，直接返回
-        if (isClickLocked.value) return;
-      }
-
-      // 锁定点击
-      isClickLocked.value = true;
-
-      if (!testPaper.value || !currentQuestion.value) return;
-
-      if (testPaper.value.soloChoice) {
-        // 单选模式：清除当前题目其他答案的选中状态
-        currentQuestion.value.answers.forEach((answer, index) => {
-          answer.selected = index === answerIndex;
-        });
-        // 记录选择
-        answers.value[currentIndex.value] = answerIndex;
-        setTimeout(() => {
-          nextQuestion();
-        }, 300);
-
-        // 延迟解锁点击
-        setTimeout(() => {
-          isClickLocked.value = false;
-        }, CLICK_DELAY);
-      } else {
-        // 多选模式：切换选中状态
-        currentQuestion.value.answers[answerIndex].selected =
-          !currentQuestion.value.answers[answerIndex].selected;
-      }
-    };
-
-    // 进入下一题或完成测评
-    const nextQuestion = () => {
-      if (isLastQuestion.value) {
-        finishTest();
-      } else {
-        currentIndex.value++;
-        // 如果下一题已经回答过，恢复选中状态
-        if (testPaper.value?.items && testPaper.value.soloChoice) {
-          const nextAnswerIndex = answers.value[currentIndex.value];
-          if (nextAnswerIndex !== -1) {
-            testPaper.value.items[currentIndex.value].answers.forEach(
-              (answer, index) => {
-                answer.selected = index === nextAnswerIndex;
-              }
-            );
-          }
-        }
-      }
-    };
-
-    // 完成测评，计算得分
-    const finishTest = async () => {
-      if (!testPaper.value) return;
-
-      try {
-        // 跳转到结果页面，传递答题数据
-        uni.redirectTo({
-          url: `/pages/test-result/index?type=test&id=${
-            testPaper.value.id
-          }&testJson=${encodeURIComponent(JSON.stringify(testPaper.value))}`,
-        });
-      } catch (e) {
-        console.error("计算分数时出错:", e);
-        uni.showToast({
-          title: "计算分数时出错",
-          icon: "none",
-        });
-      }
-    };
-
-    // 上一题按钮
-    const prevQuestion = () => {
-      if (currentIndex.value > 0) {
-        currentIndex.value--;
-        // 恢复上一题的选中状态
-        if (testPaper.value?.items && testPaper.value.soloChoice) {
-          const prevAnswerIndex = answers.value[currentIndex.value];
-          if (prevAnswerIndex !== -1) {
-            testPaper.value.items[currentIndex.value].answers.forEach(
-              (answer, index) => {
-                answer.selected = index === prevAnswerIndex;
-              }
-            );
-          }
-        }
-      }
-    };
-
-    return {
-      testPaper,
-      currentIndex,
-      currentQuestion,
-      isLastQuestion,
-      hasSelectedAnswer,
-      handleAnswer,
-      nextQuestion,
-      prevQuestion,
-    };
-  },
+// 当前问题
+const currentQuestion = computed(() => {
+  return testPaper.value?.items?.[currentIndex.value];
 });
+
+// 是否是最后一题
+const isLastQuestion = computed(() => {
+  return currentIndex.value === (testPaper.value?.items?.length || 0) - 1;
+});
+
+// 是否已选择答案（用于多选时判断是否可以进入下一题）
+const hasSelectedAnswer = computed(() => {
+  return currentQuestion.value?.answers.some((answer) => answer.selected);
+});
+
+onLoad((options: any) => {
+  const testId = options.type;
+  const test = store.state.test.testItems.find((item) => item.id === testId);
+  if (test) {
+    // 从缓存获取题目数据
+    const key = `questions_${testId}`;
+    const cachedQuestions = uni.getStorageSync(key);
+    if (cachedQuestions) {
+      const questions = JSON.parse(cachedQuestions);
+      testPaper.value = {
+        ...test,
+        items: questions,
+      };
+      resetAnswers(testPaper.value);
+    }
+  }
+
+  answers.value = new Array(testPaper.value?.items?.length || 0).fill(-1);
+
+  if (testPaper.value) {
+    uni.setNavigationBarTitle({
+      title: testPaper.value.name,
+    });
+  }
+});
+
+// 分享配置直接使用生成好的图片
+onShareAppMessage(() => {
+  return {
+    title: manifest.name,
+    path: `/pages/index/index`,
+    // imageUrl: shareImageUrl.value,
+  };
+});
+
+// 重置所有答案的选中状态
+function resetAnswers(paper: TestPaperItem) {
+  if (paper.items) {
+    paper.items.forEach((item) => {
+      item.answers.forEach((answer) => {
+        answer.selected = undefined;
+      });
+    });
+  }
+}
+// 处理答案选择
+function handleAnswer(answerIndex: number) {
+  const isDev = process.env.NODE_ENV === "development";
+  if (!isDev) {
+    // 如果点击被锁定，直接返回
+    if (isClickLocked.value) return;
+  }
+
+  // 锁定点击
+  isClickLocked.value = true;
+
+  if (!testPaper.value || !currentQuestion.value) return;
+
+  if (testPaper.value.soloChoice) {
+    // 单选模式：清除当前题目其他答案的选中状态
+    currentQuestion.value.answers.forEach((answer, index) => {
+      answer.selected = index === answerIndex;
+    });
+    // 记录选择
+    answers.value[currentIndex.value] = answerIndex;
+    setTimeout(() => {
+      nextQuestion();
+    }, 300);
+
+    // 延迟解锁点击
+    setTimeout(() => {
+      isClickLocked.value = false;
+    }, CLICK_DELAY);
+  } else {
+    // 多选模式：切换选中状态
+    currentQuestion.value.answers[answerIndex].selected =
+      !currentQuestion.value.answers[answerIndex].selected;
+  }
+}
+
+// 进入下一题或完成测评
+function nextQuestion() {
+  if (isLastQuestion.value) {
+    finishTest();
+  } else {
+    currentIndex.value++;
+    // 如果下一题已经回答过，恢复选中状态
+    if (testPaper.value?.items && testPaper.value.soloChoice) {
+      const nextAnswerIndex = answers.value[currentIndex.value];
+      if (nextAnswerIndex !== -1) {
+        testPaper.value.items[currentIndex.value].answers.forEach(
+          (answer, index) => {
+            answer.selected = index === nextAnswerIndex;
+          }
+        );
+      }
+    }
+  }
+}
+
+// 完成测评，计算得分
+function finishTest() {
+  if (!testPaper.value) return;
+
+  try {
+    // 跳转到结果页面，传递答题数据
+    uni.redirectTo({
+      url: `/pages/test-result/index?type=test&id=${
+        testPaper.value.id
+      }&testJson=${encodeURIComponent(JSON.stringify(testPaper.value))}`,
+    });
+  } catch (e) {
+    console.error("计算分数时出错:", e);
+    uni.showToast({
+      title: "计算分数时出错",
+      icon: "none",
+    });
+  }
+}
+
+// 上一题按钮
+function prevQuestion() {
+  if (currentIndex.value > 0) {
+    currentIndex.value--;
+    // 恢复上一题的选中状态
+    if (testPaper.value?.items && testPaper.value.soloChoice) {
+      const prevAnswerIndex = answers.value[currentIndex.value];
+      if (prevAnswerIndex !== -1) {
+        testPaper.value.items[currentIndex.value].answers.forEach(
+          (answer, index) => {
+            answer.selected = index === prevAnswerIndex;
+          }
+        );
+      }
+    }
+  }
+}
 </script>
 
 <style lang="scss">
