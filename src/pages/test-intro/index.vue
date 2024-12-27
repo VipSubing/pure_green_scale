@@ -196,13 +196,12 @@ async function loadRemoteQuestions(id: string): Promise<TestItem[]> {
     },
     data: { id },
   });
-  console.log("response :", response);
   if (response.statusCode === 200 && response.data) {
     const result = response.data as ResultResponse;
     if (result.code === 200) {
       const arrayBuffer = base64.decode(result.data);
 
-      const decompressed = pako.inflate(arrayBuffer);
+      const decompressed = pako.ungzip(arrayBuffer);
       const jsonString: string = new TextDecoder().decode(decompressed);
       const jsonObject = JSON.parse(jsonString);
       return jsonObject as TestItem[];

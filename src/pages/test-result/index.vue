@@ -87,6 +87,8 @@
 import { ref } from "vue";
 import { onLoad, onShareAppMessage } from "@dcloudio/uni-app";
 import { useStore } from "@/store";
+import * as base64 from "base64-arraybuffer";
+
 import type {
   ResultItem,
   ComputeResult,
@@ -136,13 +138,13 @@ onLoad(async (options: any) => {
 // 从服务器获取测试结果
 async function fetchTestResult(
   testId: string,
-  data: ArrayBuffer
+  data: string
 ): Promise<ComputeResult> {
   const response = await uni.request({
     url: RESULT_API,
     method: "POST",
     data: {
-      data,
+      buffer: data,
       id: testId,
     },
     header: {
@@ -183,8 +185,11 @@ async function retryCompute() {
     if (paperItem.items) {
       // 获取测试结果
       const jsonStr = JSON.stringify(paperItem.items);
-      const compressed = pako.deflate(jsonStr);
-      const result = await fetchTestResult(paperId, compressed);
+      const compressed = pako.gzip(jsonStr);
+      // console.log("compressed", compressed);
+      const base64Data = base64.encode(compressed);
+
+      const result = await fetchTestResult(paperId, base64Data);
       console.log("result", result);
 
       // 生成结果对象

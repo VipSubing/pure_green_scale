@@ -54,7 +54,6 @@
     "@types/base64-arraybuffer": "^0.1.0",
     "@types/pako": "^2.0.3",
     "base64-arraybuffer": "^1.0.2",
-    "jszip": "^3.10.1",
     "pako": "^2.1.0",
     "vue": "^3.4.21",
     "vue-i18n": "^9.1.9",
