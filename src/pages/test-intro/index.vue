@@ -104,6 +104,8 @@ import { onLoad, onShareAppMessage } from "@dcloudio/uni-app";
 import type { TestPaperItem, TestItem, ResultResponse } from "@/types/test";
 import { useStore } from "@/store";
 import { API_URLS } from "@/config/api";
+import pako from "pako";
+import * as base64 from "base64-arraybuffer";
 
 const QUESTIONS_BASE_URL = API_URLS.QUESTIONS;
 const TEST_INFO_BASE_URL = API_URLS.TEST_INFO;
@@ -163,7 +165,7 @@ async function loadResources(id: string): Promise<TestItem[]> {
   }
   return questions;
 }
-// 缓存相关函数
+// 缓存��关函数
 function loadQuestionsFromCache(id: string): TestItem[] | null {
   try {
     const key = `questions_${id}`;
@@ -194,11 +196,16 @@ async function loadRemoteQuestions(id: string): Promise<TestItem[]> {
     },
     data: { id },
   });
-
+  console.log("response :", response);
   if (response.statusCode === 200 && response.data) {
     const result = response.data as ResultResponse;
     if (result.code === 200) {
-      return result.data as TestItem[];
+      const arrayBuffer = base64.decode(result.data);
+
+      const decompressed = pako.inflate(arrayBuffer);
+      const jsonString: string = new TextDecoder().decode(decompressed);
+      const jsonObject = JSON.parse(jsonString);
+      return jsonObject as TestItem[];
     }
   }
   throw new Error("Failed to load questions");

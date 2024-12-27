@@ -95,7 +95,7 @@ import type {
 } from "@/types/test";
 import manifest from "@/manifest.json";
 import { API_URLS } from "@/config/api";
-
+import pako from "pako";
 const RESULT_API = API_URLS.COMPUTE;
 
 const store = useStore();
@@ -136,13 +136,13 @@ onLoad(async (options: any) => {
 // 从服务器获取测试结果
 async function fetchTestResult(
   testId: string,
-  items: any[]
+  data: ArrayBuffer
 ): Promise<ComputeResult> {
   const response = await uni.request({
     url: RESULT_API,
     method: "POST",
     data: {
-      items,
+      data,
       id: testId,
     },
     header: {
@@ -182,7 +182,9 @@ async function retryCompute() {
     loadStatus.value = 0;
     if (paperItem.items) {
       // 获取测试结果
-      const result = await fetchTestResult(paperId, paperItem.items);
+      const jsonStr = JSON.stringify(paperItem.items);
+      const compressed = pako.deflate(jsonStr);
+      const result = await fetchTestResult(paperId, compressed);
       console.log("result", result);
 
       // 生成结果对象
