@@ -1,7 +1,7 @@
 <template>
   <view class="container">
     <!-- 加载状态 -->
-    <view v-if="pageType === 'test' && loadStatus !== 1" class="loading-state">
+    <view v-if="isStatusView" class="loading-state">
       <text @click="loadStatus === 2 ? retryCompute() : null">{{
         loadStatus === 0 ? "计算结果中..." : "加载失败，点击重试"
       }}</text>
@@ -24,32 +24,15 @@
           <text class="title">{{ manifest.name }} · 测评结果</text>
         </view>
 
-        <!-- 结果区域 -->
-        <view class="result-section">
-          <view class="result-title">{{ resultInfo?.scoreText }}</view>
-          <view class="score-circle">
-            <text class="score">{{ resultInfo?.score }}</text>
-            <text class="unit">分</text>
-          </view>
-        </view>
+        <normal-result-view
+          v-if="isComputeResult(resultInfo?.result)"
+          :result="resultInfo.result"
+        />
 
-        <!-- 结果概述 -->
-        <view class="result-content">
-          <view class="section-title">
-            <view class="title-bar"></view>
-            <view>测评结果概述</view>
-          </view>
-
-          <view class="result-desc">
-            {{ resultInfo?.introTexts }}
-          </view>
-
-          <!-- 添加分割线 -->
-          <view class="divider"></view>
-
-          <!-- 免责声明 -->
-          <view class="disclaimer"> 此测试结果仅供参考，不能代替医生诊断 </view>
-        </view>
+        <scl90-result-view
+          v-else-if="isSCL90Result(resultInfo?.result)"
+          :result="resultInfo.result"
+        />
 
         <!-- 健康小贴士 -->
         <view v-if="resultInfo?.suggest" class="tips-section">
@@ -84,31 +67,42 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { onLoad, onShareAppMessage } from "@dcloudio/uni-app";
 import { useStore } from "@/store";
 import * as base64 from "base64-arraybuffer";
 
-import type {
-  ResultItem,
-  ComputeResult,
-  ResultResponse,
-  TestPaperItem,
-} from "@/types/test";
+import type { ResultItem, ResultResponse, TestPaperItem } from "@/types/test";
+
+import type { SCL90Result, ComputeResult } from "@/types/result";
+
 import manifest from "@/manifest.json";
 import { API_URLS } from "@/config/api";
 import pako from "pako";
+import NormalResultView from "@/components/NormalResult.vue";
+import SCL90ResultView from "@/components/SCL90Result.vue";
+
 const RESULT_API = API_URLS.COMPUTE;
 
 const store = useStore();
 const resultInfo = ref<ResultItem>();
 // 加载状态 0: 加载中 1: 加载完成 2: 加载失败
 const loadStatus = ref(0);
-const pageType = ref("");
+const pageType = ref("test");
+
+const isStatusView = computed(() => {
+  let res = loadStatus.value !== 1 && pageType.value === "test";
+  return res;
+});
+
 var paperItem: TestPaperItem;
 var paperId: string;
 
+const htmlFilePath = ref("");
+
 onLoad(async (options: any) => {
+  console.log("onLoad");
+
   const { type, id, testJson } = options;
   console.log("type", type, "id", id);
   pageType.value = type;
@@ -136,10 +130,7 @@ onLoad(async (options: any) => {
 });
 
 // 从服务器获取测试结果
-async function fetchTestResult(
-  testId: string,
-  data: string
-): Promise<ComputeResult> {
+async function fetchTestResult(testId: string, data: string): Promise<Object> {
   const response = await uni.request({
     url: RESULT_API,
     method: "POST",
@@ -155,18 +146,21 @@ async function fetchTestResult(
   if (response.statusCode === 200 && response.data) {
     const resultResponse = response.data as ResultResponse;
     if (resultResponse.code === 200) {
-      // 如果返回的是字符串，需要解析
-      const resultData =
-        typeof resultResponse.data === "string"
-          ? JSON.parse(resultResponse.data)
-          : resultResponse.data;
-
-      return resultData as ComputeResult;
+      return resultResponse.data;
     }
   }
   throw new Error("Failed to fetch test result");
 }
-
+// function isHtmlResult(
+//   result: ComputeResult | ComputeHtmlResult | undefined
+// ): result is ComputeHtmlResult {
+//   let res = false;
+//   if (result) {
+//     res = "html" in result;
+//   }
+//   console.log("res", res);
+//   return res;
+// }
 function goBack() {
   if (store.state.share.isFromShare) {
     uni.reLaunch({
@@ -180,6 +174,7 @@ function goBack() {
 }
 
 async function retryCompute() {
+  console.log("retryCompute");
   try {
     loadStatus.value = 0;
     if (paperItem.items) {
@@ -188,13 +183,14 @@ async function retryCompute() {
       const compressed = pako.gzip(jsonStr);
       // console.log("compressed", compressed);
       const base64Data = base64.encode(compressed);
-
+      // 获取结果
       const result = await fetchTestResult(paperId, base64Data);
-      console.log("result", result);
 
       // 生成结果对象
       const resultItem: ResultItem = {
         id: Date.now().toString(),
+        completedDate: Date.now(),
+        suggest: paperItem.suggest,
         test: {
           id: paperItem.id,
           name: paperItem.name,
@@ -206,16 +202,13 @@ async function retryCompute() {
           source: paperItem.source,
           soloChoice: paperItem.soloChoice,
         },
-        introTexts: result.summary,
-        completedDate: Date.now(),
-        score: result.score,
-        scoreText: result.level,
-        suggest: paperItem.suggest,
+        result: result,
       };
-
       // 保存到 store
       store.dispatch("test/addTestResult", resultItem);
       resultInfo.value = resultItem;
+      console.log("resultInfo init");
+
       loadStatus.value = 1;
     }
   } catch (e) {
@@ -226,6 +219,14 @@ async function retryCompute() {
     });
     loadStatus.value = 2;
   }
+}
+
+function isSCL90Result(result: any): result is SCL90Result {
+  return "factorScores" in result;
+}
+
+function isComputeResult(result: any): result is ComputeResult {
+  return "score" in result;
 }
 
 onShareAppMessage(() => {

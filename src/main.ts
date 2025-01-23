@@ -1,6 +1,7 @@
 import { createSSRApp } from "vue";
 import { store, key } from "./store";
 import App from "./App.vue";
+
 export function createApp() {
   const app = createSSRApp(App);
   app.use(store, key);
@@ -10,6 +11,7 @@ export function createApp() {
   store.dispatch("test/loadRecommendedTests");
   store.dispatch("test/loadAllTests");
 
+  console.log("env ", process.env.NODE_ENV);
   return {
     app,
   };

@@ -11,6 +11,7 @@ onHide(() => {
   console.log("App Hide");
 });
 </script>
+
 <style lang="scss">
 // @import './uni.scss';
 page {
@@ -23,4 +24,14 @@ page {
   background-repeat: no-repeat;
   min-height: 100vh; */
 }
+</style>
+
+<style>
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* 使用 scss */
+/* @import 'tailwindcss/base'; */
+/* @import 'tailwindcss/utilities'; */
+/* @import 'tailwindcss/components'; */
 </style>
