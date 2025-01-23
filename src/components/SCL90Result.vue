@@ -1,178 +1,142 @@
 <template>
-  <div class="min-h-screen bg-gray-100 py-8">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-      <h1 class="text-3xl font-bold text-center mb-8 text-gray-900">
-        测试结果
-      </h1>
+  <view class="flex flex-col min-h-screen bg-gray-100">
+    <!-- 总评估结果报告 -->
+    <view class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+      <view class="border-b border-gray-200 p-4">
+        <text class="text-l font-semibold text-gray-800">总评估结果报告</text>
+      </view>
 
-      <!-- 总评估结果报告 -->
-      <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
-        <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-          <h2 class="text-xl leading-6 font-semibold text-gray-900">
-            总评估结果报告
-          </h2>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+      <view class="overflow-x-auto">
+        <view class="min-w-full">
+          <view class="bg-gray-50 flex">
+            <view
+              class="w-1/4 px-4 py-2 text-left text-sm font-medium text-gray-500"
+              >统计项目</view
+            >
+            <view
+              class="w-1/4 px-4 py-2 text-left text-sm font-medium text-gray-500"
+              >得分结果</view
+            >
+            <view
+              class="w-1/4 px-4 py-2 text-left text-sm font-medium text-gray-500"
+              >参考结果</view
+            >
+            <view
+              class="w-1/4 px-4 py-2 text-left text-sm font-medium text-gray-500"
+              >数值范围</view
+            >
+          </view>
+          <view
+            v-for="(item, index) in summaryResults"
+            :key="index"
+            class="flex items-center border-b border-gray-200 h-[56px]"
+          >
+            <view class="w-1/4 px-4 py-2 text-sm text-gray-900">{{
+              item.name
+            }}</view>
+            <view class="w-1/4 px-4 py-2 text-sm text-gray-900">{{
+              item.score
+            }}</view>
+            <view class="w-1/4 px-4 py-2">
+              <view class="flex flex-wrap gap-2" v-if="item.result">
+                <text
+                  class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
                 >
-                  统计项目
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  得分结果
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  参考结果
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  数值范围
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="(item, index) in summaryResults" :key="index">
-                <td
-                  class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                >
-                  {{ item.name }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ item.score }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <div class="flex flex-wrap gap-2" v-if="item.result">
-                    <span
-                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
-                    >
-                      {{ item.result }}
-                    </span>
-                    <span
-                      v-if="item.severity"
-                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                      :class="getSeverityClass(item.severity)"
-                    >
-                      {{ item.severity }}
-                    </span>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ item.range }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="px-4 py-4 sm:px-6 bg-gray-50">
-          <p class="text-sm text-gray-500">
-            说明：当测试总分超过160分，或阳性项目数超过43项，需考虑筛选阳性，阳性即说明可能存在问题。由于量表只是辅助筛查工具，因此量表测试结果仅供参考。
-          </p>
-        </div>
-      </div>
+                  {{ item.result }}
+                </text>
+              </view>
+            </view>
+            <view class="w-1/4 px-4 py-2 text-sm text-gray-900">{{
+              item.range
+            }}</view>
+          </view>
+        </view>
+      </view>
 
-      <!-- 各项症状评估结果报告 -->
-      <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-          <h2 class="text-xl leading-6 font-semibold text-gray-900">
-            各项症状评估结果报告
-          </h2>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+      <view class="bg-gray-50 p-4">
+        <text class="text-sm text-gray-600">
+          说明：当测试总分超过160分，或阳性项目数超过43项，需考虑筛选阳性，阳性即说明可能存在问题。由于量表只是辅助筛查工具，因此量表测试结果仅供参考。
+        </text>
+      </view>
+    </view>
+
+    <!-- 各项症状评估结果报告 -->
+    <view class="bg-white rounded-lg shadow-md overflow-hidden">
+      <view class="border-b border-gray-200 p-4">
+        <text class="text-l font-semibold text-gray-800"
+          >各项症状评估结果报告</text
+        >
+      </view>
+
+      <view class="overflow-x-auto">
+        <view class="min-w-full">
+          <view class="bg-gray-50 flex">
+            <view
+              class="w-1/5 px-4 py-2 text-left text-sm font-medium text-gray-500"
+              >因子</view
+            >
+            <view
+              class="w-1/5 px-4 py-2 text-left text-sm font-medium text-gray-500"
+              >得分</view
+            >
+            <view
+              class="w-1/5 px-4 py-2 text-left text-sm font-medium text-gray-500"
+              >平均分数</view
+            >
+            <view
+              class="w-1/5 px-4 py-2 text-left text-sm font-medium text-gray-500"
+              >参考结果</view
+            >
+            <view
+              class="w-1/5 px-4 py-2 text-left text-sm font-medium text-gray-500"
+              >数值范围</view
+            >
+          </view>
+          <view
+            v-for="factor in factors"
+            :key="factor.name"
+            class="flex items-center border-b border-gray-200 h-[56px]"
+          >
+            <view class="w-1/5 px-4 py-2 text-sm text-gray-900">{{
+              factor.name
+            }}</view>
+            <view class="w-1/5 px-4 py-2 text-sm text-gray-900">{{
+              factor.score
+            }}</view>
+            <view class="w-1/5 px-4 py-2 text-sm text-gray-900">{{
+              factor.average
+            }}</view>
+            <view class="w-1/5 px-4 py-2">
+              <view class="flex flex-wrap gap-2" v-if="factor.result">
+                <text
+                  :class="[
+                    'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
+                    getSeverityClass(factor.severity),
+                  ]"
                 >
-                  因子
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  得分
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  平均分数
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  参考结果
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  数值范围
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="factor in factors" :key="factor.name">
-                <td
-                  class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                >
-                  {{ factor.name }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ factor.score }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ factor.average }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <div class="flex flex-wrap gap-2" v-if="factor.result">
-                    <span
-                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
-                    >
-                      有症状
-                    </span>
-                    <span
-                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                      :class="getSeverityClass(factor.severity)"
-                    >
-                      {{ factor.severity }}
-                    </span>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ factor.range }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="px-4 py-4 sm:px-6 bg-gray-50">
-          <p class="text-sm text-gray-500">
-            说明：由于量表只是辅助筛查工具，因此量表测试结果仅供参考。
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
+                  {{ factor.severity }}
+                </text>
+              </view>
+            </view>
+            <view class="w-1/5 px-4 py-2 text-sm text-gray-900">{{
+              factor.range
+            }}</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="bg-gray-50 p-4">
+        <text class="text-sm text-gray-600">
+          说明：由于量表只是辅助筛查工具，因此量表测试结果仅供参考。
+        </text>
+      </view>
+    </view>
+  </view>
 </template>
 
 <script lang="ts">
 export default {
-  name: "SCL90ResultView",
+  name: "Scl90ResultView",
 };
 </script>
 
@@ -188,20 +152,17 @@ const summaryResults = [
   {
     name: "总分",
     score: props.result.totalScore,
-    result: props.result.totalScore >= 160 ? "阳性症状" : undefined,
+    result: props.result.totalScore >= 160 ? "阳性" : undefined,
     range: "90~450",
   },
   {
     name: "总症状指数",
     score: props.result.totalSymptomIndex,
-    result: props.result.totalSymptomIndex >= 2 ? "有症状" : undefined,
-    severity: getSeverity(props.result.totalSymptomIndex),
     range: "1~5",
   },
   {
     name: "阳性症状项目数",
     score: props.result.positiveItemCount,
-    result: props.result.positiveItemCount >= 43 ? "阳性症状" : undefined,
     range: "0~90",
   },
   {

@@ -28,7 +28,7 @@
           v-if="isComputeResult(resultInfo?.result)"
           :result="resultInfo.result"
         />
-
+        <!-- SCL90ResultView -->
         <scl90-result-view
           v-else-if="isSCL90Result(resultInfo?.result)"
           :result="resultInfo.result"
@@ -77,10 +77,10 @@ import type { ResultItem, ResultResponse, TestPaperItem } from "@/types/test";
 import type { SCL90Result, ComputeResult } from "@/types/result";
 
 import manifest from "@/manifest.json";
-import { API_URLS } from "@/config/api";
+import { API_URLS, ISDEV } from "@/config/api";
 import pako from "pako";
 import NormalResultView from "@/components/NormalResult.vue";
-import SCL90ResultView from "@/components/SCL90Result.vue";
+import Scl90ResultView from "@/components/SCL90Result.vue";
 
 const RESULT_API = API_URLS.COMPUTE;
 
@@ -97,8 +97,6 @@ const isStatusView = computed(() => {
 
 var paperItem: TestPaperItem;
 var paperId: string;
-
-const htmlFilePath = ref("");
 
 onLoad(async (options: any) => {
   console.log("onLoad");
@@ -123,6 +121,27 @@ onLoad(async (options: any) => {
     resultInfo.value = store.state.test.historyResults.find(
       (item: ResultItem) => item.id === id
     );
+
+    // if (ISDEV) {
+    //   if (resultInfo.value && isSCL90Result(resultInfo.value.result)) {
+    //     resultInfo.value.result.totalScore = 180;
+    //     resultInfo.value.result.totalSymptomIndex = 2.5;
+    //     resultInfo.value.result.positiveItemCount = 70;
+    //     resultInfo.value.result.positiveSymptomDistressIndex = 2.5;
+    //     resultInfo.value.result.factorScores.somatization = 60;
+    //     resultInfo.value.result.factorScores.obsessiveCompulsive = 50;
+    //     resultInfo.value.result.factorScores.interpersonalSensitivity = 30;
+    //     resultInfo.value.result.factorScores.depression = 30;
+    //     resultInfo.value.result.factorScores.anxiety = 10;
+    //     resultInfo.value.result.factorScores.hostility = 10;
+    //     resultInfo.value.result.factorScores.phobicAnxiety = 10;
+    //     resultInfo.value.result.factorScores.paranoidIdeation = 10;
+    //     resultInfo.value.result.factorScores.psychoticism = 10;
+    //     resultInfo.value.result.factorScores.additionalItems = 10;
+    //     console.log("result:", JSON.stringify(resultInfo.value));
+    //   }
+    // }
+
     uni.setNavigationBarTitle({
       title: resultInfo.value?.test.name || "测试结果",
     });
@@ -151,16 +170,7 @@ async function fetchTestResult(testId: string, data: string): Promise<Object> {
   }
   throw new Error("Failed to fetch test result");
 }
-// function isHtmlResult(
-//   result: ComputeResult | ComputeHtmlResult | undefined
-// ): result is ComputeHtmlResult {
-//   let res = false;
-//   if (result) {
-//     res = "html" in result;
-//   }
-//   console.log("res", res);
-//   return res;
-// }
+
 function goBack() {
   if (store.state.share.isFromShare) {
     uni.reLaunch({
@@ -205,9 +215,9 @@ async function retryCompute() {
         result: result,
       };
       // 保存到 store
-      store.dispatch("test/addTestResult", resultItem);
+      await store.dispatch("test/addTestResult", resultItem);
+      console.log("store success");
       resultInfo.value = resultItem;
-      console.log("resultInfo init");
 
       loadStatus.value = 1;
     }

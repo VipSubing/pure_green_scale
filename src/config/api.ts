@@ -1,8 +1,8 @@
 // API 基础路径
 // 根据环境判断使用哪个baseURL
-const isDev = process.env.NODE_ENV === "development";
+export const ISDEV = process.env.NODE_ENV === "development";
 
-export const API_BASE_URL = isDev
+export const API_BASE_URL = ISDEV
   ? "http://127.0.0.1:8080/scale"
   : "https://subing.site/scale";
 
