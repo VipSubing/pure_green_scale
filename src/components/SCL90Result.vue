@@ -163,6 +163,7 @@ const summaryResults = [
   {
     name: "阳性症状项目数",
     score: props.result.positiveItemCount,
+    result: props.result.positiveItemCount >= 43 ? "阳性" : undefined,
     range: "0~90",
   },
   {

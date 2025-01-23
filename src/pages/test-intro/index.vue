@@ -38,7 +38,11 @@
           <view class="info-item">
             <text class="number">{{ testInfo?.duration }}</text>
             <text class="label">分钟</text>
-            <text class="desc">简单快速</text>
+            <text class="desc">{{
+              (testInfo?.duration ? testInfo.duration : 0) <= 5
+                ? "简单快速"
+                : "耐心作答"
+            }}</text>
           </view>
           <view class="info-item">
             <text class="number">{{ testInfo?.questionCount }}</text>
