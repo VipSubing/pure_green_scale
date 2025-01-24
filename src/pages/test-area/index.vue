@@ -77,7 +77,6 @@ export default defineComponent({
 
     const proTest = computed(() => store.getters["test/proTest"]);
     const gridTestItems = computed(() => store.getters["test/gridTestItems"]);
-
     // 在 test-area/index.vue 中修改 goToTest 方法
     const goToTest = (id: string) => {
       console.log(`id : ${id}`);

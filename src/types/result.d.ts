@@ -24,3 +24,14 @@ export interface ComputeResult {
   level: string;
   summary: string;
 }
+
+export interface FivePersonalyResult {
+  scores: {
+    N: number; // 神经质
+    E: number; // 外向性
+    O: number; // 开放性
+    A: number; // 宜人性
+    C: number; // 尽责性
+  };
+  result: string[]; // 各维度的描述性结果
+}

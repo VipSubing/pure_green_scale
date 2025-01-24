@@ -33,7 +33,10 @@
           v-else-if="isSCL90Result(resultInfo?.result)"
           :result="resultInfo.result"
         />
-
+        <five-personaly-result-view
+          v-else-if="isFivePersonalyResult(resultInfo?.result)"
+          :result="resultInfo.result"
+        />
         <!-- 健康小贴士 -->
         <view v-if="resultInfo?.suggest" class="tips-section">
           <view class="section-title">
@@ -74,14 +77,18 @@ import * as base64 from "base64-arraybuffer";
 
 import type { ResultItem, ResultResponse, TestPaperItem } from "@/types/test";
 
-import type { SCL90Result, ComputeResult } from "@/types/result";
+import type {
+  SCL90Result,
+  ComputeResult,
+  FivePersonalyResult,
+} from "@/types/result";
 
 import manifest from "@/manifest.json";
 import { API_URLS, ISDEV } from "@/config/api";
 import pako from "pako";
 import NormalResultView from "@/components/NormalResult.vue";
 import Scl90ResultView from "@/components/SCL90Result.vue";
-
+import FivePersonalyResultView from "@/components/FivePersonalyResult.vue";
 const RESULT_API = API_URLS.COMPUTE;
 
 const store = useStore();
@@ -121,7 +128,7 @@ onLoad(async (options: any) => {
     resultInfo.value = store.state.test.historyResults.find(
       (item: ResultItem) => item.id === id
     );
-
+    console.log("resultInfo:", JSON.stringify(resultInfo.value?.result));
     // if (ISDEV) {
     //   if (resultInfo.value && isSCL90Result(resultInfo.value.result)) {
     //     resultInfo.value.result.totalScore = 180;
@@ -237,6 +244,19 @@ function isSCL90Result(result: any): result is SCL90Result {
 
 function isComputeResult(result: any): result is ComputeResult {
   return "score" in result;
+}
+
+function isFivePersonalyResult(result: any): result is FivePersonalyResult {
+  return (
+    "scores" in result &&
+    "result" in result &&
+    "N" in result.scores &&
+    "E" in result.scores &&
+    "O" in result.scores &&
+    "A" in result.scores &&
+    "C" in result.scores &&
+    Array.isArray(result.result)
+  );
 }
 
 onShareAppMessage(() => {
