@@ -387,6 +387,7 @@ onShareAppMessage(() => {
 }
 
 .tips-section {
+  margin-top: $uni-spacing-col-lg;
   background: $uni-bg-color;
   border-radius: $uni-border-radius-lg;
   padding: $uni-spacing-row-lg;

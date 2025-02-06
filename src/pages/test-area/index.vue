@@ -67,7 +67,6 @@ import { defineComponent, computed } from "vue";
 import { useStore } from "@/store";
 
 export default defineComponent({
-  name: "TestArea",
   setup() {
     const store = useStore();
 

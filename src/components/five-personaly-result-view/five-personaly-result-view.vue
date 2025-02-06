@@ -1,5 +1,5 @@
 <template>
-  <view class="bg-white p-4 rounded-lg shadow-lg w-full max-w-md">
+  <view class="bg-white p-4 rounded-lg w-full max-w-md">
     <view class="flex justify-center mb-8">
       <canvas
         canvas-id="resultChart"
@@ -12,10 +12,10 @@
     <view class="space-y-4">
       <view v-for="(score, key) in testResult" :key="key" class="border-b pb-2">
         <view class="flex justify-between items-center">
-          <text class="font-semibold text-blue-700">{{
+          <text class="font-semibold text-blue-700 primary-text">{{
             capitalizeFirstLetter(key)
           }}</text>
-          <text class="text-blue-600">{{ score.toFixed(1) }}</text>
+          <text class="text-blue-600 primary-text">{{ score.toFixed(1) }}</text>
         </view>
         <text class="text-sm text-gray-600 mt-1 block">{{
           interpretations[key]
@@ -62,7 +62,15 @@ onReady(() => {
 });
 
 function capitalizeFirstLetter(string: string): string {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+  const titles = {
+    neuroticism: "神经质",
+    conscientiousness: "严谨性",
+    agreeableness: "宜人性",
+    openness: "开放性",
+    extraversion: "外向性",
+  };
+
+  return titles[string as keyof typeof titles];
 }
 
 function drawChart() {
@@ -164,6 +172,9 @@ function canvasTouchStart(e: any) {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 /* 这里可以添加任何额外的自定义样式 */
+.primary-text {
+  color: $uni-color-primary;
+}
 </style>
