@@ -88,7 +88,7 @@ import { API_URLS, ISDEV } from "@/config/api";
 import pako from "pako";
 import NormalResultView from "@/components/NormalResult.vue";
 import Scl90ResultView from "@/components/SCL90Result.vue";
-import FivePersonalyResultView from "@/components/FivePersonalyResult.vue";
+import FivePersonalyResultView from "@/components/FivePersonalyResultView.vue";
 const RESULT_API = API_URLS.COMPUTE;
 
 const store = useStore();
