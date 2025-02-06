@@ -86,9 +86,6 @@ import type {
 import manifest from "@/manifest.json";
 import { API_URLS, ISDEV } from "@/config/api";
 import pako from "pako";
-import NormalResultView from "@/components/NormalResult.vue";
-import Scl90ResultView from "@/components/SCL90Result.vue";
-import FivePersonalyResultView from "@/components/FivePersonalyResultView.vue";
 const RESULT_API = API_URLS.COMPUTE;
 
 const store = useStore();
@@ -198,8 +195,9 @@ async function retryCompute() {
       // 获取测试结果
       const jsonStr = JSON.stringify(paperItem.items);
       const compressed = pako.gzip(jsonStr);
-      // console.log("compressed", compressed);
-      const base64Data = base64.encode(compressed);
+      const base64Data = base64.encode(
+        new Uint8Array(compressed).buffer as ArrayBuffer
+      );
       // 获取结果
       const result = await fetchTestResult(paperId, base64Data);
 

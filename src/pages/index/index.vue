@@ -28,7 +28,6 @@
 import { ref } from "vue";
 import { onShow, onReady, onShareAppMessage } from "@dcloudio/uni-app";
 import { useStore } from "@/store";
-import NavTabs from "@/components/NavTabs.vue";
 import TestArea from "@/pages/test-area/index.vue";
 import AllTests from "@/pages/all-tests/index.vue";
 import HistoryTests from "@/pages/history-tests/index.vue";

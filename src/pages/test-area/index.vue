@@ -65,13 +65,9 @@
 <script lang="ts">
 import { defineComponent, computed } from "vue";
 import { useStore } from "@/store";
-import TestGrid from "@/components/TestGrid.vue";
 
 export default defineComponent({
   name: "TestArea",
-  components: {
-    TestGrid,
-  },
   setup() {
     const store = useStore();
 

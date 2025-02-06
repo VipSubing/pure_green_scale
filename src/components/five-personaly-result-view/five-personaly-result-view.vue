@@ -1,41 +1,31 @@
 <template>
-  <view class="min-h-screen bg-blue-50 flex items-center justify-center p-4">
-    <view class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-      <text class="text-3xl font-bold text-blue-700 mb-6 text-center block"
-        >中国大五人格问卷简式版 (CBF-PI-B) 结果</text
-      >
+  <view class="bg-white p-4 rounded-lg shadow-lg w-full max-w-md">
+    <view class="flex justify-center mb-8">
+      <canvas
+        canvas-id="resultChart"
+        id="resultChart"
+        style="width: 300px; height: 300px"
+        @touchstart="canvasTouchStart"
+      ></canvas>
+    </view>
 
-      <view class="flex justify-center mb-8">
-        <canvas
-          canvas-id="resultChart"
-          id="resultChart"
-          style="width: 300px; height: 300px"
-          @touchstart="canvasTouchStart"
-        ></canvas>
-      </view>
-
-      <view class="space-y-4">
-        <view
-          v-for="(score, key) in testResult"
-          :key="key"
-          class="border-b pb-2"
-        >
-          <view class="flex justify-between items-center">
-            <text class="font-semibold text-blue-700">{{
-              capitalizeFirstLetter(key)
-            }}</text>
-            <text class="text-blue-600">{{ score.toFixed(1) }}</text>
-          </view>
-          <text class="text-sm text-gray-600 mt-1 block">{{
-            interpretations[key]
+    <view class="space-y-4">
+      <view v-for="(score, key) in testResult" :key="key" class="border-b pb-2">
+        <view class="flex justify-between items-center">
+          <text class="font-semibold text-blue-700">{{
+            capitalizeFirstLetter(key)
           }}</text>
+          <text class="text-blue-600">{{ score.toFixed(1) }}</text>
         </view>
+        <text class="text-sm text-gray-600 mt-1 block">{{
+          interpretations[key]
+        }}</text>
       </view>
     </view>
   </view>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { onReady } from "@dcloudio/uni-app";
 import { onMounted, reactive } from "vue";
 import { getCurrentInstance } from "vue";

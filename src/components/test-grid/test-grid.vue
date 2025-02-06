@@ -37,7 +37,6 @@ import type { PropType } from "vue";
 import type { TestPaperItem } from "@/types/test";
 
 export default defineComponent({
-  name: "TestGrid",
   props: {
     testItems: {
       type: Array as PropType<TestPaperItem[]>,

@@ -28,12 +28,6 @@
   </view>
 </template>
 
-<script lang="ts">
-export default {
-  name: "NormalResultView",
-};
-</script>
-
 <script setup lang="ts">
 import type { ComputeResult } from "@/types/result";
 
