@@ -69,7 +69,7 @@ import { ref, computed } from "vue";
 import { onLoad, onShareAppMessage } from "@dcloudio/uni-app";
 import { useStore } from "@/store";
 import type { TestPaperItem } from "@/types/test";
-import manifest from "@/manifest.json";
+import { ISDEV, manifest } from "@/env";
 const store = useStore();
 const testPaper = ref<TestPaperItem>();
 const currentIndex = ref(0);
@@ -141,8 +141,7 @@ function resetAnswers(paper: TestPaperItem) {
 }
 // 处理答案选择
 function handleAnswer(answerIndex: number) {
-  const isDev = process.env.NODE_ENV === "development";
-  if (!isDev) {
+  if (!ISDEV) {
     // 如果点击被锁定，直接返回
     if (isClickLocked.value) return;
   }

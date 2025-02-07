@@ -152,10 +152,14 @@ async function loadData() {
       if (!testInfo.value) {
         throw new Error("Test not found");
       }
+
       testInfo.value.items = await loadResources(id.value);
+      console.log("testInfo.value.items", testInfo.value.items);
     }
     loadStatus.value = 1;
   } catch (e) {
+    console.log("e", e);
+
     loadStatus.value = 2;
   }
 }
@@ -169,7 +173,7 @@ async function loadResources(id: string): Promise<TestItem[]> {
   }
   return questions;
 }
-// 缓存��关函数
+// 缓存相关函数
 function loadQuestionsFromCache(id: string): TestItem[] | null {
   try {
     const key = `questions_${id}`;
@@ -200,13 +204,19 @@ async function loadRemoteQuestions(id: string): Promise<TestItem[]> {
     },
     data: { id },
   });
+
   if (response.statusCode === 200 && response.data) {
     const result = response.data as ResultResponse;
     if (result.code === 200) {
       const arrayBuffer = base64.decode(result.data);
-
       const decompressed = pako.ungzip(arrayBuffer);
-      const jsonString: string = new TextDecoder().decode(decompressed);
+
+      // 使用 decodeURIComponent 和 escape 处理中文
+      const jsonString = decodeURIComponent(
+        escape(String.fromCharCode.apply(null, Array.from(decompressed)))
+      );
+
+      console.log("jsonString", jsonString);
       const jsonObject = JSON.parse(jsonString);
       return jsonObject as TestItem[];
     }
