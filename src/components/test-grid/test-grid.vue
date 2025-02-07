@@ -74,7 +74,7 @@ export default defineComponent({
     }
 
     .card-title {
-      font-size: $uni-font-size-lg;
+      font-size: $uni-font-size-sm;
       font-weight: 500;
       color: $uni-text-color;
       margin-bottom: 20rpx;

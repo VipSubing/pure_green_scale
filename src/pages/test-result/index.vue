@@ -35,7 +35,7 @@
         />
         <five-personaly-result-view
           v-else-if="isFivePersonalyResult(resultInfo?.result)"
-          :result="resultInfo.result"
+          :test-result="resultInfo.result"
         />
         <!-- 健康小贴士 -->
         <view v-if="resultInfo?.suggest" class="tips-section">

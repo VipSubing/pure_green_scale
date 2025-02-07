@@ -171,7 +171,7 @@ export default defineComponent({
     }
 
     .card-desc {
-      font-size: $uni-font-size-base;
+      font-size: $uni-font-size-sm;
       color: $uni-text-color-grey;
       margin-bottom: 20rpx;
       display: -webkit-box;

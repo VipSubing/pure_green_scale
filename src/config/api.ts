@@ -1,6 +1,8 @@
 // API 基础路径
 // 根据环境判断使用哪个baseURL
-export const ISDEV = process.env.NODE_ENV === "development";
+import { manifest } from "../env";
+
+export const ISDEV = manifest.env.USER_ENV === "dev";
 
 export const API_BASE_URL = ISDEV
   ? "http://127.0.0.1:8080/scale"

@@ -1,24 +1,30 @@
 <template>
-  <view class="bg-white p-4 rounded-lg w-full max-w-md">
+  <view v-if="props.testResult" class="bg-white p-4 rounded-lg w-full max-w-md">
     <view class="flex justify-center mb-8">
       <canvas
         canvas-id="resultChart"
         id="resultChart"
-        style="width: 300px; height: 300px"
+        style="width: 100%; height: 300px"
         @touchstart="canvasTouchStart"
       ></canvas>
     </view>
 
     <view class="space-y-4">
-      <view v-for="(score, key) in testResult" :key="key" class="border-b pb-2">
+      <view
+        v-for="(score, key, index) in props.testResult.scores"
+        :key="key"
+        class="border-b pb-2"
+      >
         <view class="flex justify-between items-center">
           <text class="font-semibold text-blue-700 primary-text">{{
             capitalizeFirstLetter(key)
           }}</text>
-          <text class="text-blue-600 primary-text">{{ score.toFixed(1) }}</text>
+          <text class="text-blue-600 primary-text">{{
+            Math.floor(score)
+          }}</text>
         </view>
         <text class="text-sm text-gray-600 mt-1 block">{{
-          interpretations[key]
+          props.testResult.result[index]
         }}</text>
       </view>
     </view>
@@ -27,49 +33,32 @@
 
 <script setup lang="ts">
 import { onReady } from "@dcloudio/uni-app";
-import { onMounted, reactive } from "vue";
 import { getCurrentInstance } from "vue";
+import type { FivePersonalyResult } from "@/types/result";
+
+const props = defineProps<{
+  testResult: FivePersonalyResult;
+}>();
+
 const instance = getCurrentInstance();
 
-interface TestResult {
-  neuroticism: number;
-  conscientiousness: number;
-  agreeableness: number;
-  openness: number;
-  extraversion: number;
-}
+const maxScore = 48;
 
-const testResult: TestResult = reactive({
-  neuroticism: 3.5,
-  conscientiousness: 4.2,
-  agreeableness: 3.8,
-  openness: 4.0,
-  extraversion: 3.2,
-});
-
-const maxScore = 5;
-
-const interpretations: Record<keyof TestResult, string> = {
-  neuroticism: "倾向于经历负面情绪,如焦虑、抑郁、愤怒等。",
-  conscientiousness: "体现了一个人的责任心、条理性和可靠性。",
-  agreeableness: "反映了个体在人际关系中的和谐程度。",
-  openness: "表现为对新经验的接受程度和创造性思维。",
-  extraversion: "体现了一个人的社交倾向和活跃程度。",
+const titles = {
+  N: "神经质-反向分",
+  E: "外向性",
+  O: "开放性",
+  A: "宜人性",
+  C: "尽责性",
 };
 
 onReady(() => {
+  console.log("props.testResult", props.testResult);
+  props.testResult.scores.N = maxScore - props.testResult.scores.N;
   drawChart();
 });
 
 function capitalizeFirstLetter(string: string): string {
-  const titles = {
-    neuroticism: "神经质",
-    conscientiousness: "严谨性",
-    agreeableness: "宜人性",
-    openness: "开放性",
-    extraversion: "外向性",
-  };
-
   return titles[string as keyof typeof titles];
 }
 
@@ -78,8 +67,8 @@ function drawChart() {
   const canvasWidth = 300;
   const canvasHeight = 300;
   const centerX = canvasWidth / 2;
-  const centerY = canvasHeight / 2;
-  const radius = 120;
+  const centerY = canvasHeight / 2 + 10; // 向下移动20px
+  const radius = 105;
 
   // 绘制背景五边形
   ctx.beginPath();
@@ -99,7 +88,7 @@ function drawChart() {
 
   // 绘制结果五边形
   ctx.beginPath();
-  Object.values(testResult).forEach((score, index) => {
+  Object.values(props.testResult.scores).forEach((score, index) => {
     const angle = (Math.PI * 2 * index) / 5 - Math.PI / 2;
     const x = centerX + radius * Math.cos(angle) * (score / maxScore);
     const y = centerY + radius * Math.sin(angle) * (score / maxScore);
@@ -116,7 +105,7 @@ function drawChart() {
   ctx.stroke();
 
   // 绘制轴线
-  Object.values(testResult).forEach((_, index) => {
+  Object.values(props.testResult.scores).forEach((_, index) => {
     const angle = (Math.PI * 2 * index) / 5 - Math.PI / 2;
     const x = centerX + radius * Math.cos(angle);
     const y = centerY + radius * Math.sin(angle);
@@ -128,7 +117,7 @@ function drawChart() {
   });
 
   // 绘制得分点和标签
-  Object.values(testResult).forEach((score, index) => {
+  Object.values(props.testResult.scores).forEach((score, index) => {
     const angle = (Math.PI * 2 * index) / 5 - Math.PI / 2;
     const x = centerX + radius * Math.cos(angle) * (score / maxScore);
     const y = centerY + radius * Math.sin(angle) * (score / maxScore);
@@ -147,11 +136,11 @@ function drawChart() {
     ctx.setFontSize(12);
     ctx.setTextAlign("center");
     ctx.setTextBaseline("middle");
-    ctx.fillText(score.toFixed(1), labelX, labelY);
+    ctx.fillText(Math.floor(score).toString(), labelX, labelY);
   });
 
   // 绘制特质标签
-  const traits = ["神经质", "严谨性", "宜人性", "开放性", "外向性"];
+  const traits = Object.values(titles);
   traits.forEach((trait, index) => {
     const angle = (Math.PI * 2 * index) / 5 - Math.PI / 2;
     const x = centerX + (radius + 30) * Math.cos(angle);
