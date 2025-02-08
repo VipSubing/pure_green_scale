@@ -1,0 +1,77 @@
+# Global 全局使用中文交互
+
+## 项目设置
+
+# 技术栈
+tech_stack:
+  - framework: Vue 3
+  - language: TypeScript
+  - platform: UniApp
+  - style: Vue 3 Composition API
+
+# 项目结构
+project_structure:
+  - use_single_file_components: true
+  - organize_components_by_feature: true
+  - separate_logic_and_presentation: true
+
+## 开发规范
+
+# 代码风格
+code_style:
+  # 使用 Prettier 进行代码格式化，确保代码风格统一
+  - use_prettier_for_formatting: true
+  # 遵循 ESLint 推荐的规则，保持代码质量
+  - follow_eslint_recommended_rules: true
+  # 使用分号结尾，增加代码可读性
+  - use_semicolons: true
+  # 优先使用单引号，保持字符串引用风格一致
+  - prefer_single_quotes: true
+  # 日志
+  - log:
+      - 使用 console.log 进行日志输出
+      - 关键数据使用log输出
+  # 注释
+  - annotation:
+      - 多使用注释进行代码解释，方便日后维护
+
+# 组件开发
+component_development:
+  - use_composition_api: true
+  - prefer_script_setup: true
+  - ensure_reusability_and_modularity: true
+  - use_vuex_for_state_management: true
+
+# 类型检查
+type_checking:
+  - use_strict_type_checking: true
+  - define_all_props_and_emits: true
+
+## 性能优化
+
+# 优化策略
+performance_optimization:
+  - use_lazy_loading_for_routes: true
+  - implement_code_splitting: true
+  - optimize_images_and_assets: true
+  - use_virtual_scrolling_for_large_lists: true
+
+## 文档和维护
+
+# 文档
+documentation:
+  - maintain_detailed_readme: true
+  - document_all_public_apis: true
+  - use_jsdoc_for_function_comments: true
+
+# 维护
+maintenance:
+  - regularly_update_dependencies: true
+  - perform_code_reviews: true
+  - conduct_regular_refactoring: true
+
+# 参考
+references:
+  - vue_official_guide: "https://vuejs.org/guide/introduction.html"
+  - uniapp_documentation: "https://uniapp.dcloud.io/"
+  - typescript_handbook: "https://www.typescriptlang.org/docs/"
